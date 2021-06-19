@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/zachs/Documents/Lab/Quaddle_2.0.1/ObjectTableGenerator/functions.cpp
+functions.h
+C:/Users/zachs/Documents/Lab/Quaddle_2.0.1/ObjectTableGenerator/functions.h
+
+C:/Users/zachs/Documents/Lab/Quaddle_2.0.1/ObjectTableGenerator/functions.h
+iostream
+-
+fstream
+-
+random
+-
+

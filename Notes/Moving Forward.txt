@@ -1,0 +1,9 @@
+5/20: 
+Going to begin building a high level overview of what we are adding/modifying in
+Quaddle 1.0 Script.
+Work on: 
+(1) Converting to GreyScale
+(2) Arm Positioning
+(3) A Totem Pole extension.
+
+-----------------------------------------------------------------------------------
