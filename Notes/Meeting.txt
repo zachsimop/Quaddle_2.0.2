@@ -1,0 +1,55 @@
+Topics of Interest
+
+Structure
+	Files
+		Init file 
+			Declares constants, which is pulled from a text file.
+			Constants include Dims, Vals, Default variables, and more
+
+			It would also include initialization the 'object bank.' 
+			The object bank is a 2D (or possibly 3D, not sure yet) array that holds the necessary 
+			components to build a quaddle given a certain body type. 
+			The components would be indexed at a certain location, predetermined by a constant. 
+			For example, if the program decided to put the octahedron information at index 2, the 
+			objbody, maps (for patterns, colours, icons, and fractals) for the octahedron would be all in index 2. 
+
+			The advantage of this is we would only need to create assets once, then refer to the array 
+			and copy the asset at the given locatin instead of having to recreate it over and over again. 
+
+		Helper_Functions file
+			Helps with scoping. Practically, it would add readability to the program. An example of a function 
+			that would be in the file would be isOctohedron(). In reality this function is a simple 
+			zen boolean expression, but it makes it easier to understand the code.
+
+	Object Tables
+		It may be to our advantage to implement 2 ways to represent quaddle generation. The different kinds would be 
+		demarcated to the program by having their names on the first line of the text file.
+		The two kinds are: "Individual" & "Ranged"
+	
+		An Individual Object Table is exactly what we had in Quaddles 1.0 - each line represents one quaddle the progam
+		simply iterates through each line
+
+		A Ranged Object Table is what Marcus mentioned during the meeting on tuesday. It looks like this.
+		"[1, 8, 9] [2] [1, 2]..."
+
+		This would only require one line. It also has other capabilities that I could implement. 
+
+		For example if we were to add an 'all' function, it would be easy to represent creating all of the object for
+		others using the quaddle generator. If the word 'all' is put in brackets, then it would create all variations 
+		of quaddles respective to that dimensions. Here is an example:
+		"[all] [all] [all]..."
+
+		We also could implement ranges to make it easy to omit one case and what not. Here is an example.
+		"[1-4] [3-7, 9] [2-8]..."
+
+		Lasly they could all be mixed.
+		"[all] [2, 3, 4] [3-9]..."
+
+
+Aspect Ratio
+	We can express the aspect ratio in two ways using 3ds max. Manually (manipulating the "ffd 3x3" modifier) or utilizing 
+	the "stretch" modifier. I know how to to both, and each have their advantages and disadvantages. The former is more time 
+	consuming but allows more fine tuned customization while the latter is exactly the opposite. I prefer the former, even 
+	though it requires a decent amount of editing to the existing scripts. 
+			
+			
