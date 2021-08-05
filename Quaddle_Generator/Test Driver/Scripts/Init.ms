@@ -1,7 +1,21 @@
+-- Attention-Circuits-Control L
+--Laboratory (www.attention-circuits-control.org) --
+
+--For more information on how Quaddles are generated and may be used:
+--Watson, MR., Voloh, B., Naghizadeh, M., Womelsdorf, T., (2018) “Quaddles: A multidimensional 3D object set with parametrically-controlled
+-- and customizable features” Behav Res Methods.
+
+--Website guide: http://accl.psy.vanderbilt.edu/resources/analysis-tools/3d-image-material/
+--Brief instructions on how to use scripts: http://accl.psy.vanderbilt.edu/quaddlegenerator-brief-instructions/
+
+--Scripts, objects and in depth manual available on github: https://github.com/att-circ-contrl/Quaddles-Gen
+
+--This program is essentially a stand alone program; however, it functions to feed the main script the 
+-- Dimensions and Values the user enters. The navigating functions (found in "Helper_Functions.ms") help traverse
+-- Asset_Data.txt and are used in addInformation().
 clearListener()
 
---Need to add error messaging. This includes range permission for certain data (i.e. aspect ratio only has 3 values. If the user enters more than that, ObjAssoc
---write an error message. Other ones include syntax and others. 
+--change to true if you want to debug this file
 testing = false
 
 if testing then 
@@ -9,14 +23,15 @@ if testing then
 
 
 fn loadInAssets = (
-	--textures for main body
+	
 	Dims = #()
 	Vals = #()
 
+	--Hardcoded paths for debugging
 	if testing then (
-		myPath = "C:\\Users\\zachs\\Documents\\Lab\\Quaddle_2.0.2\\Quaddle_Generator\\Test Driver\\Assets & Object Table\\Assets\\"
-		objTable = openFile (myPath + "Object Table.txt")
-		data = openFile (myPath + "Asset Data.txt")
+		myPath = "C:\\Users\\zachs\\Documents\\Lab\\Quaddle_2.0.2\\Quaddle_Generator\\Test Driver\\"
+		objTable = openFile (myPath + "User\\Object Table.txt")
+		data = openFile (myPath + "Assets\\Asset Data.txt")
 		singleArmLoc = "Both"
 	)
 	
@@ -26,20 +41,6 @@ fn loadInAssets = (
 	print Dims
 	print "***VALS***"
 	print Vals
-	local myData = spliceVals()
-		
-	global dimSet = myData[1]
-	global valSet = myData[2]
-	
-	deleteArrayItems(myData)
-
-	--if objects are set to be transparent, this number will determine how transparent the objects will be
-	transparencyAmount = 25	
-	objNames = #()
-	
-	--if you wish to make a custom object that is intermediate between shapes, you have to set one of the body dimensions as custom...
-	--...and put in custom values here
-	--Values must add up to 1!
 	
 	if testing then (
 		close objTable
@@ -48,28 +49,43 @@ fn loadInAssets = (
 	
 )
 
+--Description: Gets the user data from object table.txt in order to pass it to addInformation()
+--Input: none
+--Outputs: If the user entered good syntax, or if data needs to be re-entered
+--Example Call: getUserData()
 fn getUserData
 objTable: objTable data: data	Dims: Dims= (
 	
+	--keeps track of the number of dimensions
 	dimVal = 1
+	--keeps track of what line in object table the function is on
+	--Allows us to go back in the program if we'd like
 	counter = 1
 	
+	--puts location of scanner at 0
 	seek objTable 0
 	seek data 0
+	--goto first bracket
 	skipToString objTable "["
 	
 	while not (eof objTable) do (
 		
 		infoAsString = ""
+		
+		--Lets us know if a given dimension defined in object table
+		--was specified as a quaddle dimension by the user
 		dimIncluded = true
 		
+		--get data in between brackets
 		while (findString infoAsString "]" == undefined) do 
 			infoAsString = infoAsString + readChar objTable
 		
-		
+		--delete bracket in string 
 		infoAsString = substring infoAsString 1 (infoAsString.count-1)
+		--filterstring returns an array of strings parsed by the second arguement
 		info = filterString infoAsString "," 
 		
+		--used for syntax error messaging (see if the user entered too high of a number)
 		maxVal = findMaxVal()
 		
 		for i = 1 to info.count do (
@@ -79,12 +95,14 @@ objTable: objTable data: data	Dims: Dims= (
 			newVal = trimRight newVal
 			newVal = toLower newVal
 			
+			--check syntax
 			isGoodVal = checkVal(newVal)
 			
 			if isGoodVal then
 				dimIncluded = addInformation(newVal)
 			else	(
 				
+				--If there was incorrect syntax, return false
 				close objTable
 				close data
 				return false
@@ -93,9 +111,10 @@ objTable: objTable data: data	Dims: Dims= (
 			
 		)
 		
-		if (dimIncluded) then (
+		if dimIncluded then (
 			
 			resetPosInFile()
+			--get the name of the New Dimension
 			newDim = readDelimitedString data ":"
 			newDim = trimLeft newDim
 			append Dims newDim
@@ -103,6 +122,7 @@ objTable: objTable data: data	Dims: Dims= (
 			
 		)
 		
+		--goto next dimension value
 		skipToString objTable "["
 		counter = counter + 1
 		
@@ -114,16 +134,22 @@ objTable: objTable data: data	Dims: Dims= (
 	
 )
 
+--Description: Recieves the user values determined by getUserData() then uses that info
+--					to fetch the corresponding Dimension and Value from asset table.txt
+--Input: all implicit
+--Outputs: true if a dimension was added, false if not
+--Example Call: addInformation(val)
 fn addInformation 
 str dimVal: dimVal Vals: Vals Dims:Dims counter: counter = (
 
 	resetPosInFile()
 	
-	if( doNotUseDim(str) ) then (
+	--If user enters "none", there is no new dimension
+	if doNotUseDim(str) then
 		return false
-	)
-	
-	if ( useAllValsInDim(str) ) then (
+
+	--If user enters "all", add all values from asset_data.txt
+	if useAllValsInDim(str) then (
 		
 		while not endOfLine() do (
 			
@@ -132,11 +158,14 @@ str dimVal: dimVal Vals: Vals Dims:Dims counter: counter = (
 			
 		)
 		
+		return true
+		
 	)
 	
+	--enter correct position in file
 	nextVal()
 	
-	if ( isRange(str) ) then (
+	if isRange(str) then (
 		
 		rangeVals = filterString str "-"
 		
@@ -152,20 +181,25 @@ str dimVal: dimVal Vals: Vals Dims:Dims counter: counter = (
 			
 		)
 		
+		return true
+		
 	)
 	
-	if (str.count <= 2) then (
-		
-		gotoVal(str)
-		addDataToArray()
-		
-	)
+	--else a singular number was entered, and 
+	--we goto that value
+	gotoVal(str)
+	addDataToArray()
 	
 	return true
 	
 )
 
-fn addDataToArray Vals: Vals = (
+--Description: Recieves the user values determined by getUserData() then uses that info
+--					to fetch the corresponding Dimension and Value from asset table.txt
+--Input: all implicit
+--Outputs: true if a dimension was added, false if not
+--Example Call: addDataToArray()
+fn addDataToArray dimVal:dimVal Vals: Vals = (
 	
 	if Vals[dimVal] == undefined then
 		append Vals #()
@@ -174,6 +208,12 @@ fn addDataToArray Vals: Vals = (
 	
 )
 
+--Description: Modifies the Vals of Arm count based on the user preference
+-- 					"Single Arm Location" to include "1L" (one left arm) or "1R"
+--					(one right arm) or both.
+--Input: none
+--Outputs: none
+--Example Call: modifyArmCount()
 fn modifyArmCount = (
 	
 	if objHasArmCount() then
@@ -190,11 +230,18 @@ fn modifyArmCount = (
 
 )
 
+--Description: The function that checks for simple syntax errors. If you wish to 
+--					add more syntax errors this is the place. 
+--Input: userVal (an individual value that is determined by parsing commas in brackets in getUserData()). 
+--			This is the value is checked. maxVal: the total number of possible enteries. For example maxVal will
+--			Will be 16 when evaluating Icon dimensions because that is the number of possible values
+--Outputs: true if the syntax is appropriate, false if not
+--Example Call: checkVal(val)
 fn checkVal userVal maxVal: maxVal = (
 	
-	if doNotUseDim(userVal) or useAllValsinDim(userVal) or isRange(userVal) then (
+	if doNotUseDim(userVal) or useAllValsinDim(userVal) or isRange(userVal) then 
 		return true
-	)
+	
 	
 	if userVal as integer == undefined then (
 		messageBox ("An invalid character was entered in the value: " + userVal)
@@ -202,12 +249,12 @@ fn checkVal userVal maxVal: maxVal = (
 	)
 	
 	userInt = userVal as integer
-	if (userInt < 0) then (
-		resetPosInFile()
-		messagebox ("The value \"" + userVal + "\" is too small for the dimension \"" + (readDelimitedString data ":") + "\"")
-		return false
-	)
-	
+-- 	if (userInt < 0) then (
+-- 		resetPosInFile()
+-- 		messagebox ("The value \"" + userVal + "\" is too small for the dimension \"" + (readDelimitedString data ":") + "\"")
+-- 		return false
+-- 	)
+
 	if (userInt >= maxVal) then (
 		messagebox ("The value \"" + userVal + "\" is too large for the dimension \"" + (readDelimitedString data ":") + "\"")
 		return false
@@ -215,6 +262,13 @@ fn checkVal userVal maxVal: maxVal = (
 	
 	return true
 )
+
+--Description: The second of round of error checking. It checks for logical misinputs like having
+--					having a beak but no head. goodSyntax is included so that this code will not execute
+--					until the syntax is corrected.
+--Input: Dims, goodSyntax
+--Outputs: true if the logic is appropriate, false if not
+--Example Call: checkForErrors()
 
 fn checkForErrors 
 Dims: Dims goodSyntax: goodSyntax = (
@@ -267,148 +321,5 @@ Dims: Dims goodSyntax: goodSyntax = (
 	)
 	
 	return mybool
-	
-)
-
-fn spliceVals Vals: Vals Dims: Dims= (
-	
-	myDimArr = #()
-	myValArr = #()
-	
-	if(( objHasPattern() or objHasColour()) and
-		(objHasFractal()) and ( objHasIcon() )) then (
-
-		local temp1Vals = deepCopy Vals
-		local temp1Dims = deepCopy Dims
-		deleteItem temp1Dims ( getFractalLoc() )
-		deleteItem temp1Dims ( getIconLoc() )
-		deleteItem temp1Vals ( getFractalLoc() )
-		deleteItem temp1Vals ( getIconLoc() )
-		append myDimArr temp1Dims
-		append myValArr temp1Vals
-		
-		local temp2Vals = deepCopy Vals
-		local temp2Dims = deepCopy Dims
-		deleteItem temp2Vals ( getFractalLoc() )
-		deleteItem temp2Dims ( getFractalLoc() )
-		if( objHasPattern()) then
-			deleteItem temp2Dims ( getPatternLoc() )
-		if(objHasColour()) then
-			deleteItem temp2Dims ( getColourLoc() ) 
-		if( objHasPattern()) then
-			deleteItem temp2Vals ( getPatternLoc() )
-		if(objHasColour()) then
-			deleteItem temp2Vals ( getColourLoc() ) 
-		append myDimArr temp2Dims
-		append myValArr temp2Vals
-		
-		local temp3Vals = deepCopy Vals
-		local temp3Dims = deepCopy Dims
-		deleteItem temp3Vals ( getIconLoc() )
-		deleteItem temp3Dims ( getIconLoc() )
-		if( objHasPattern()) then
-			deleteItem temp3Dims ( getPatternLoc() )
-		if( objHasPattern()) then
-			deleteItem temp3Vals ( getPatternLoc() )
-		if(objHasColour()) then
-			deleteItem temp3Dims ( getColourLoc() ) 
-		if(objHasColour()) then
-			deleteItem temp3Vals ( getColourLoc() ) 
-		
-		append myValArr temp3Vals
-		append myDimArr temp3Dims
-		
-		finished = #(myDimArr,myValArr)
-		
-		return finished
-		
-	)
-
-	else if(( objHasPattern() or objHasColour()) and
-			   (objHasFractal())) then (
-		
-		local temp1Vals = deepCopy Vals
-		local temp1Dims = deepCopy Dims
-		deleteItem temp1Dims ( getFractalLoc() )
-		deleteItem temp1Vals ( getFractalLoc() )
-		append myDimArr temp1Dims
-		append myValArr temp1Vals
-
-		local temp2Vals = deepCopy Vals
-		local temp2Dims = deepCopy Dims
-		if( objHasPattern()) then
-			deleteItem temp2Dims ( getPatternLoc() )
-		if( objHasPattern()) then
-			deleteItem temp2Vals ( getPatternLoc() )
-		if(objHasColour()) then
-			deleteItem temp2Dims ( getColourLoc() )
-		if(objHasColour()) then
-			deleteItem temp2Vals ( getColourLoc() )
-		append myDimArr temp2Dims
-		append myValArr temp2Vals
-		
-		finished = #(myDimArr,myValArr)
-		
-		return finished
-		
-	)
-
-	else if(( objHasPattern() or objHasColour()) and
-			   ( objHasIcon() )) then (
-		
-		local temp1Vals = deepCopy Vals
-		local temp1Dims = deepCopy Dims
-		deleteItem temp1Dims ( getIconLoc() )
-		deleteItem temp1Vals ( getIconLoc() )
-		append myDimArr temp1Dims
-		append myValArr temp1Vals
-			
-		local temp2Dims = deepCopy Vals
-		local temp2Vals = deepCopy Vals
-		if( objHasPattern()) then
-			deleteItem temp2Dims ( getPatternLoc() )
-		if( objHasPattern()) then
-			deleteItem temp2Vals ( getPatternLoc() )
-		if(objHasColour()) then
-			deleteItem temp2Dims ( getColourLoc() )
-		if(objHasColour()) then
-			deleteItem temp2Vals ( getColourLoc() )
-		append myDimArr temp2Dims
-		append myValArr temp2Vals
-		
-		finished = #(myDimArr,myValArr)
-		
-		return finished
-		
-	)
-
-	else if( (objHasFractal()) and ( objHasIcon() ) ) then (
-		
-		local temp1Vals = deepCopy Vals
-		local temp1Dims = deepCopy Dims
-		deleteItem temp1Dims ( getFractalLoc() )
-		deleteItem temp1Vals ( getFractalLoc() )
-		append myDimArr temp1Dims
-		append myValArr temp1Vals
-		
-		local temp2Vals = deepCopy Vals
-		local temp2Dims = deepCopy Dims
-		deleteItem temp2Dims ( getIconLoc() )
-		deleteItem temp2Vals ( getIconLoc() )
-		append myDimArr temp2Dims
-		append myValArr temp2Vals
-		
-		finished = #(myDimArr,myValArr)
-		
-		return finished
-		
-	)
-	
-	append myDimArr Dims
-	append myValArr Vals
-
-	finished = #(myDimArr,myValArr)
-	
-	return finished
 	
 )

@@ -15,16 +15,22 @@
 --making circle for camera to move on
 circ = circle()
 
+Obj.pivot = [0,0,0]
+
+if headVal() == "No Head" or objDoesNotHaveHead() then 
+	targetPos = 0
+else 
+	targetPos = (-bodyZMin + hBodyZMax) / 3.5
+
 circ.radius = abs (cos(anglevalue) * camdistance)
 circ.pos = [0,0,(sin(anglevalue) * camdistance)]
 
-targetPos = objbody.center[3]/2
-if(objVals[findItem Dims "Aspect_Ratio"] == "Long") then
-	targetPos = targetPos - 5
+-- if(objVals[findItem Dims "Aspect_Ratio"] == "Long") then
+-- 	targetPos = targetPos - 5
 
 cam = freeCamera()
 cam.type = #target
-cam.target.pos = [objbody.center[1],objbody.center[2],targetPos]
+cam.target.pos = [0,0,targetPos]
 
 --path constraint
 pc = path_constraint()
@@ -37,7 +43,6 @@ anglestring = anglevalue as string
 fileNameForPic =  fileNameForPic + "pictures\\" + anglestring
 makeDir fileNameForPic
 
-
 --smoothhighlights is a render setting
 viewport.SetRenderLevel #smoothhighlights
 picturelocation = fileNameForPic + "\\" + anglestring + "_0deg_rotation_" + picname + ".jpg"
@@ -45,7 +50,8 @@ picturelocation = fileNameForPic + "\\" + anglestring + "_0deg_rotation_" + picn
 
 render outputFile: (picturelocation) vfb: off outputSize: [1280,720]
 
---rotate camera and take photos again
+
+rotate Obj (eulerAngles 0 0 45)
 picturelocation = fileNameForPic + "\\" + anglestring + "_45deg_rotation_" + picname + ".jpg"
 picturelocation = fileNameForPic + "\\" + anglestring + "_45deg_rotation_" + picname + ".png"
 

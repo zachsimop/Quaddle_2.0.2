@@ -13,51 +13,123 @@
 --FUNCTIONS LIST
 FileIn "Helper_Functions.ms"
 
-fn generateObjects dimCount = (
+
+--Description: Modifies Dims to be passed into generateObjects()
+--				The main modification it makes to Dims is changing the strings of all mutually exculsive dimensions to "N/A" except for one.
+--				Each iteration of the for loop will pass in a Dims array with a different mutually exculsive dimension not labeled "N/A".
+--				This is necessary because when a Dimension is labeled something that the program cannot recognize, it will not generate it.
+--				Therefore, we omit the generative problems from mutual exclusion. 
+--					To be clear, look at MakeObjects() and go to where it says "objHasIcon()". This function, objHasIcon() searches for 
+--					the word "Icon" in Dims, but in the case that the word was turned to the string "N/A" it would skip the code inside the 
+--					if statement because the word "Icon" would not exist in Dims.
+--Input: none
+--Outputs: none
+--Example Call: createObjects()
+--NOTE: Since the Dimensions "Colour" and "Pattern" are mutually exclusive but are dependant on each other, there is code to take this into
+--			account; however, it only works granted that Colour comes before Pattern in  Dims.
+fn createObjects Dims: Dims = (
+	
+	if numOfME() <= 1 then
+		generateQuaddles(1)
+	else (
+		
+		for iter = 1 to Dims.count do (
+			
+			if isMutuallyExclusive(iter) then (
+				
+				for y = iter+1 to Dims.count do (
+					
+					if Dims[iter] == "Colour" and Dims[y] == "Pattern" then
+						y = y + 1
+					
+					if isMutuallyExclusive(y) then 
+						Dims[y] = "N/A"
+					
+				)
+				generateQuaddles(1)
+				
+				resetDims(iter)
+				if objHasPattern() then 
+					Dims[iter+1] = "N/A"
+				
+				
+				Dims[iter] = "N/A"
+				
+			)
+			
+		)
+		
+	)
+	
+)
+
+--Description: A recursive function that it used for the general control of materializing the quaddle, like defining, making and exporting it.
+--				Every Quaddle is defined by the array "objVals" and makeQuaddle() generates based off that array, and this function defines
+--				the objVals to pass to makeQuaddle(). It does this by recuring through every possible combination of values then passing it through
+--				to be made. It also builds the display name, the one you see on the maxscript listener.
+--Input: should always be 1
+--Implicitly Called: Dims, Vals
+--Outputs: none
+--Example Call: generateQuaddles(1)
+--NOTE: Since the Dimensions "Colour" and "Pattern" are mutually exclusive but are dependant on each other, there is code to take this into
+--			account; however, it only works granted that Colour comes before Pattern in  Dims.
+
+fn generateQuaddles dimCount Dims: Dims = (
 	
 	allObjects = #()
 	numOfObjects = 0
-	
 	for valCount = 1 to Vals[dimCount].count do(
 		
 		objVals[dimCount] = Vals[dimCount][valCount]
 		
 		if dimCount != Vals.count then
-			generateObjects(dimCount+1)
+			generateQuaddles(dimCount+1)
 		
-		else if dimCount == Vals.count then
+		if dimCount == vals.Count then
 		(
 			if userWantsPics or userWantsFBX then
-				Obj = makeObject()
+				Obj = makeQuaddle()
 			
 			if userWantsPics then
-				TakePics(Obj)(0)(camDistance)
+				TakePics(Obj)(PicAngle)(camDistance)
+			
 			if userWantsFBX then
-				ExportObject()
+				ExportFBX()
 			
 			if userWantsPics or userWantsFBX then
 				delete Obj
 			
 			numOfObjects = numOfObjects + 1
 			temp = copy objVals #nomap
+			
+			objName = objVals[1] 
+			if objvals.count > 1 do (
+				for dimCount = 2 to objvals.count do (
+					if Dims[dimCount] != "N/A" then
+						objName = objName + " + " + objVals[dimCount]
+				)
+			)
+			print objName
+			
 			allObjects[numOfObjects] = temp	
 		
 		)
+		
 	)
-	print allObjects
 )
 
---MAIN FUNCTION FOR MAKING OBJECTS--
-fn MakeObject 
-Dims:Dims objVals:objVals assetPath:assetPath  percentages: percentages dimCount: dimCount
-transparencyAmount:transparencyAmount = (
-	--Description: Main function for making and saving objects
-	--Input: pretty much all variables from the MainScript script
-	--Example Call: MakeObject() will create a given object defined by its features in "objvals"
-
---bodyType used in Body generation. Used to Avoid unecessary calls
-	bodyType = objVals[1]
-
+--Description: This function is where we directly interact with the render, building the quaddles.
+--					Much of the building objects refers on calling other scripts or functions; however,
+--					you can see that the Icon and Fractal are handeled directly in the function, since they
+--					are applied differently than those in applyTexture()
+--Input: none
+--Implicitly Called: Dims, Vals, assetPath, percentages, dimCount, 
+--Outputs: qArray
+--Example Call: makeQuaddle()
+--NOTE: The Dims "Pattern" and Colour" are determined in applyTexture()
+fn makeQuaddle 
+Dims:Dims objVals:objVals assetPath:assetPath  percentages: percentages dimCount: dimCount = (
+	
 	--Ensure Dimensions are labeled correctly
 	if findItem Dims "Color" != 0 do
 		Dims[findItem Dims "Color"] = "Colour"
@@ -70,22 +142,25 @@ transparencyAmount:transparencyAmount = (
 	qArray = #()
 
 --BODY GENERATION
-	
 	if objHasAspectRatio() then (
 		
+		--determine relevant values given an aspect ratio
 		if ( aspectRatioVal() == "Null") then (
 			ratio = 0
-			camDistance = 150
+			camDistance = 165
+			armScale = 1
 		)
 		
 		if ( aspectRatioVal() == "Long") then (
 			ratio = 0.3
-			camDistance = 200
+			camDistance = 215
+			armScale = 1.1
 		)
 		
 		if ( aspectRatioVal() == "Short") then (
 			ratio = -0.2
-			camDistance = 125
+			camDistance = 145
+			armScale = 0.9
 		)
 		
 	) else (
@@ -93,15 +168,19 @@ transparencyAmount:transparencyAmount = (
 		ratio = 0
 		
 	)
-	
-	bodyResult = MakeBody(bodyType)
+
+--Make Body
+	bodyResult = MakeBody( bodyVal() )
 	objbody = bodyResult[1]
 	polygonner = bodyResult[2]
 	qArray = bodyResult[3]
 	SmoothenEdges(objbody)
-	
+
+--Get Values used for positioning head and camera
 	bodyZMax = objBody.max[3]
+	bodyZMin = objBody.min[3]
 	
+--Apply texture to body
 	textureResult = ApplyTexture(objbody)
 	assetPath = textureResult[1]
 	map = textureResult[2]
@@ -110,34 +189,55 @@ transparencyAmount:transparencyAmount = (
 
 	if objHasIcon()  do (
 
-		iconPath = assetPath + "Icons\\" + iconVal()
-		mat = Bitmaptexture filename:(iconPath)
-		objbody.material = standardMaterial diffuseMap:(mat)
-		myMap = uvwmap() 
-		myMap.length = SCALE_SIZE
-		myMap.width = SCALE_SIZE
-		myMap.height = SCALE_SIZE
+		if iconVal() != "No Icon" then (
+			
+			--Apply Icon Material
+			iconPath = assetPath + "Icons\\" + greyColour + "\\" + iconVal()
+			mat = Bitmaptexture filename:(iconPath)
+			objbody.material = standardMaterial diffuseMap:(mat)
+			
+			--Create and Apply appropriate map
+			myMap = uvwmap() 
+			myMap.length = SCALE_SIZE
+			myMap.width = SCALE_SIZE
+			myMap.height = SCALE_SIZE		
+			
+			max modify mode
+			select objbody
+			
+			--Get relevant values to position the Icon correctly on a given body
+			hrApp = DEFAULT_HR; angleApp = DEFAULT_ANGLES
+			if bodyType == "Cubic" then
+				angleApp = CUBIC_ANGLES
+			else if bodyType == "Pyrimidal" then
+				hrApp = PYRIMIDAL_HR
+			else if bodyType == "Compressed_Oblong" then
+				hrApp = CO_HR
+			
+			--The map is then rotated and positioned when it is applied to the Body_Cutter
+			--NOTE: the "gizmo" is the little icon with the x,y, and z axises in the editor.
+			--	The call here simply accesses the one beloning to the map.
+			--ANOTHER NOTE: MaxScript can only access it in modify mode. hence the code above.
+			addmodifier objbody myMap 
+			myMap.gizmo.rotation = angleApp
+			myMap.gizmo.position = [0,0,objbody.height/hrApp]
+			deselect objbody
+			
+		) else (
+			
+			--simply apply the designated grey colour
+			iconPath = assetPath + "Patterns and Colours\\" + greyColour + ".png"
+			mat = Bitmaptexture filename:(iconPath)
+			objbody.material = standardMaterial diffuseMap:(mat)
+			
+		)
 		
-		max modify mode
-		select objbody
-		hrApp = DEFAULT_HR; angleApp = DEFAULT_ANGLES
-		if bodyType == "Cubic" then
-			angleApp = CUBIC_ANGLES
-		else if bodyType == "Pyrimidal" then
-			hrApp = PYRIMIDAL_HR
-		else if bodyType == "Compressed_Oblong" then
-			hrApp = CO_HR
-		
-
-		addmodifier objbody myMap 
-		myMap.gizmo.rotation = angleApp
-		myMap.gizmo.position = [0,0,objbody.height/hrApp]
-		deselect objbody
-
 	)
-		
+	
 	if objHasFractal() then (
 	
+		--Same as Icon
+		if fractalVal() != "No Fractal" then (
 		FractalPath = assetPath + "Fractals\\" + greyColour + "\\" + fractalVal() 
 		mat = Bitmaptexture filename:(FractalPath)
 		objbody.material = standardMaterial diffuseMap:(mat)
@@ -155,12 +255,20 @@ transparencyAmount:transparencyAmount = (
 			hrApp = PYRIMIDAL_HR
 		else if bodyType == "Compressed_Oblong" then
 			hrApp = CO_HR
-
-
+		
 		addmodifier objbody myMap 
 		myMap.gizmo.rotation = angleApp
 		myMap.gizmo.position = [0,0,objbody.height/hrApp]
 		deselect objbody
+		
+		) else (
+		
+		FractalPath = assetPath + "Patterns and Colours\\" + greyColour + ".png"
+		mat = Bitmaptexture filename:(FractalPath)
+		objbody.material = standardMaterial diffuseMap:(mat)
+		
+		)
+
 
 	)
 
@@ -175,12 +283,19 @@ transparencyAmount:transparencyAmount = (
 			headResult = MakeBody( headVal() )
 			headBody = headResult[1]
 			
-			headTextureResult = ApplyTexture(headBody)
-			assetPath = headTextureResult[1]
-			headMap = headTextureResult[2]
-			headBody = headTextureResult[3]
-			headoutMap = headTextureResult[4]
+			if objHasColour() or objHasPattern() then (
+				
+				textureResult = ApplyTexture(headBody)
+				
+			) else (
+				
+				pcPath = assetPath + "Patterns and Colours\\" + greyColour + ".png"
+				mat = Bitmaptexture filename:(pcPath)
+				headBody.material = standardMaterial diffuseMap:(mat)
+				
+			)
 			
+			--Position and Scale Head
 			scale headBody [0.5,0.5,0.5]
 			
 			hBodyZMax = headBody.max[3]
@@ -191,47 +306,47 @@ transparencyAmount:transparencyAmount = (
 		)
 	)
 
-	if ( objHasBeak() and headVal() != "No Head") do (
+	if ( objHasBeak() and headVal() != "No Head" and beakVal() != "No Beak") do (
 		isBeak = true
-		beakResult = makeArms()
+		beakResult = makeArmsOrBeak()
 		qArray = beakResult[2]
 	)
 
 --ARM GENERATION
-	if (objHasArmAngle())  or (objHasArmAngle()) do (
+	--NOTE: only Arm Anlge is checked because the program 
+	if objHasArmCount() and armCountVal() != "0" do (
 		
 		isBeak = false
-		armResult = MakeArms()
+		armResult = MakeArmsOrBeak()
 		listOfArms = armResult[1] 
 		qArray = armResult[2]
 		
 	)
 	
-	nameVal = nameVal + 1
-	objName = "Object_" + nameVal as String
+	
+	NAME_VAL = NAME_VAL + 1
+	objName = "Object_" + NAME_VAL as String
 	group (qArray as array) name: objName
 	
 	return qArray
+	
 )
 
+--Description: Creates main body of objects (body and head). Accesses appropriate scripts for specific body
+--Input: requires object values, and object percentages for custom "amalgam" bodies
+--Outputs: Creates main body
+--Example Call: MakeBodies("Cubic") will make the cubic body
 fn MakeBody 
-body objName:objName percentages: percentages ratio: ratio
-Dims: Dims Vals:Vals qArray:qArray = (
+body objName:objName percentages: percentages ratio: ratio = (
 	
-	--Description: Creates main body of objects. Accesses appropriate scripts for specific body
-	--Input: requires object values, and object percentages for custom "amalgam" bodies
-	--Outputs: Creates main body
-	--Example Call: MakeBodies("Cubic") will make the cubic body
-		
-	
-	if ( objHasPattern() ) then 
+	if objHasPattern() then 
 		local pattern = patternVal()
 	else
-			local pattern = "None"
+		local pattern = "None"
 		
 	if (body == "Oblong") then (
 		
-		bodyResult = MakeOblongBody(pattern)
+		bodyResult = MakeOblongBody()
 		controlPoint = bodyResult[1]
 		objbody = bodyResult[2]
 		polygonner = bodyResult[3]
@@ -240,7 +355,7 @@ Dims: Dims Vals:Vals qArray:qArray = (
 		
 	else if (body == "Pyramidal") then (
 		
-		bodyResult = MakePyramidBody(pattern)
+		bodyResult = MakePyramidBody()
 		controlPoint = bodyResult[1]
 		objbody = bodyResult[2]
 		polygonner = bodyResult[3]
@@ -249,7 +364,7 @@ Dims: Dims Vals:Vals qArray:qArray = (
 		
 	else if (body == "Concave") then (
 		
-		bodyResult = MakeConcaveBody(pattern)
+		bodyResult = MakeConcaveBody()
 		controlPoint = bodyResult[1]
 		objbody = bodyResult[2]
 		polygonner = bodyResult[3]
@@ -258,7 +373,7 @@ Dims: Dims Vals:Vals qArray:qArray = (
 		
 	else if (body == "Octahedron") then (
 		
-		bodyResult = MakeOctahedronBody(pattern)
+		bodyResult = MakeOctahedronBody()
 		controlPoint = bodyResult[1]
 		objbody = bodyResult[2]
 		polygonner = bodyResult[3]
@@ -267,7 +382,7 @@ Dims: Dims Vals:Vals qArray:qArray = (
 		
 	else if (body == "Cubic") then (
 		
-		bodyResult = MakeCubicBody(pattern)
+		bodyResult = MakeCubicBody()
 		controlPoint = bodyResult[1]
 		objbody = bodyResult[2]
 		polygonner = bodyResult[3]
@@ -276,7 +391,7 @@ Dims: Dims Vals:Vals qArray:qArray = (
 		
 	else if (body == "Dumbbell") then (
 		
-		bodyResult = MakeDumbbellBody(pattern)
+		bodyResult = MakeDumbbellBody()
 		controlPoint = bodyResult[1]
 		secondControlPoint = bodyResult[2]
 		objbody = bodyResult[3]
@@ -287,7 +402,7 @@ Dims: Dims Vals:Vals qArray:qArray = (
 		
 	else if (body == "Convex") then (
 		
-		bodyResult = MakeConvexBody(pattern)
+		bodyResult = MakeConvexBody()
 		controlPoint = bodyResult[1]
 		secondControlPoint = bodyResult[2]
 		objbody = bodyResult[3]
@@ -297,7 +412,7 @@ Dims: Dims Vals:Vals qArray:qArray = (
 		
 	else if (body == "Pepper") then (
 		
-		bodyResult = MakePepperBody(pattern)
+		bodyResult = MakePepperBody()
 		controlPoint = bodyResult[1]
 		secondControlPoint = bodyResult[2]
 		objbody = bodyResult[3]
@@ -305,10 +420,10 @@ Dims: Dims Vals:Vals qArray:qArray = (
 		
 	)
 		
-		--compressedOblongOutput = #(controlPoint,objbody,squisher,polygonner2)
+	--compressedOblongOutput = #(controlPoint,objbody,squisher,polygonner2)
 	else if (body == "Compressed_Oblong") then (
 		
-		bodyResult = MakeCompressedOblongBody(pattern)
+		bodyResult = MakeCompressedOblongBody()
 		controlPoint = bodyResult[1]
 		objbody = bodyResult[2]
 		squisher = bodyResult[3]
@@ -318,7 +433,7 @@ Dims: Dims Vals:Vals qArray:qArray = (
 		
 	else if (body == "Sphere") then (
 		
-		bodyResult = MakeSphereBody(pattern)
+		bodyResult = MakeSphereBody()
 		controlPoint = bodyResult[1]
 		objbody = bodyResult[2]
 		polygonner = bodyResult[3]
@@ -334,33 +449,23 @@ Dims: Dims Vals:Vals qArray:qArray = (
 		polygonner = bodyResult[3]
 		
 	)
-
-	--Giving object main bodies names
-	--objbody.name = objName + "_Body"
 	
 	append qArray objbody
 
 	bodyOutput = #(objbody,polygonner,qArray)
 	return bodyOutput
-		
--- 	return objbody
--- 	return polygonner
--- 	return qArray
-		
+	
+
 )
 
+--Description: Applies texture to main body of object
+--Input: objbody (main object body), assetPath(texture and folder path to be applied), Dims(object dimensions), Vals, objvals(
+--Example Call: ApplyTexture(objbody)("C://Person//Documents//Patterns//Pattern(Diamond)+Colour(Blue)") will apply the blue diamond pattern to the "objbody" object
 fn ApplyTexture 
 objbody 
-assetPath:assetPath Dims:Dims Vals:Vals objvals:objvals =
+assetPath:assetPath Dims:Dims Vals:Vals =
 (
-	--Description: Applies texture to main body of object
-	--Input: objbody (main object body), assetPath(texture and folder path to be applied), Dims(object dimensions), Vals, objvals(
-	--Example Call: ApplyTexture(objbody)("C://Person//Documents//Patterns//Pattern(Diamond)+Colour(Blue)") will apply the blue diamond pattern to the "objbody" object
-	
 	pcPath = assetPath + "Patterns and Colours\\"
-	
-	if greyColour == "180_180_180" then
-		greyColour = greyColour + ".png"
 	
 	if (findItem Dims "Pattern_Inversion" != 0) then (
 		
@@ -372,15 +477,16 @@ assetPath:assetPath Dims:Dims Vals:Vals objvals:objvals =
 	) else 
 		invertText = ""
 	
-	
-	if  objHasPattern()  and objHasColour()  then (
+	--Determine proper material application given colour and pattern
+	if objHasPattern()  and objHasColour()  then (
 
 		if patternVal() == "No Pattern" then (
 			
 			if colourVal() == "Grey" then
-				texturePath = pcPath + greyColour
+				texturePath = pcPath + greyColour + ".png"
 			else
 				texturePath = pcPath + "Colour(" + colourVal() + ").png"
+			
 		)
 		else
 			texturePath= pcPath + "Pattern(" + patternVal() + ")+Colour(" + colourVal() + ")" + invertText + ".png"
@@ -388,12 +494,12 @@ assetPath:assetPath Dims:Dims Vals:Vals objvals:objvals =
 	)
 	
 	else if objDoesNotHavePattern() and objDoesNotHaveColour() then 
-		texturePath= pcPath + greyColour
+		texturePath= pcPath + greyColour + ".png"
 
 	else if objHasPattern() and objDoesNotHaveColour() then (
 		
 		if patternVal() == "No Pattern" then
-			texturePath= pcPath + greyColour
+			texturePath= pcPath + greyColour + ".png"
 		else
 			texturePath= pcPath + "Pattern(" + patternVal() + ")+Colour(Grey)" +  invertText + ".png"
 		
@@ -402,17 +508,14 @@ assetPath:assetPath Dims:Dims Vals:Vals objvals:objvals =
 	else if objDoesNotHavePattern() and objHasColour() then (
 		
 		if colourVal() == "Grey" then
-			texturePath = pcPath + greyColour
+			texturePath = pcPath + greyColour + ".png"
 		else
 			texturePath = pcPath + "Colour(" + colourVal() + ")" + invertText + ".png"
 		
 	)
-	
-	if greyColour == "180_180_180.png" then
-		greyColour = "180_180_180"
-	
+
 	body = bodyVal()
-	
+	pattern = patternVal()
 	--APPLYING PROPER WRAPPING	
 	--uv map allows textures to be properly rendered onto object in appropriate way
 	--over here--
@@ -491,14 +594,33 @@ assetPath:assetPath Dims:Dims Vals:Vals objvals:objvals =
 			addmodifier objbody map
 		)
 	)
+	else if (body == "Cubic") then
+	(
+
+		if (pattern == "Checkered") then (
+			map.length = 40
+			map.width = 40
+			map.height = 50		
+		)
+		if (pattern == "Diamond") then
+			map.height = 60
+		
+		map.utile = 2
+		map.vtile = 1
+		map.cap = false
+		addmodifier objbody map
+		
+	)
 	else if (pattern == "Checkered") then
 	(
+		map.utile = 2
 		map.height = 60
 		addmodifier objbody map
 	)
 	else if (pattern == "Diamond") then
 	(
-		map.height = 100
+		map.utile = 2
+		map.height = 60
 		addmodifier objbody map
 	)
 	else 
@@ -510,39 +632,32 @@ assetPath:assetPath Dims:Dims Vals:Vals objvals:objvals =
 	--ACTUALLY APPLYING THE TEXTURE
 	--putting material on texture
 	outMap = Bitmaptexture  fileName: (texturePath)
--- 	ccnode = Color_Correction()
--- 	ccnode map outMap
--- 	ccnode rewireMode 1
 	objbody.material = standardMaterial diffuseMap:(outMap) showInViewport:true;
 	
 	textureOutput = #(assetPath,map,objbody,outMap)
 	return textureOutput
--- 	return assetPath
--- 	return map
--- 	return objbody
--- 	return outMap
+
  )
 
-fn MakeArms 
+--Description: Makes Arms and Beak
+--Input: arms(specific kind of arms to be made), objName (the name of the object)
+--Outputs: Creates arms
+--Example Call: MakeArms("Bent_Up")("Body(Oblong)+Arms(Bent_Up)") will add arms to the object thead are bent upwards
+fn MakeArmsOrBeak 
 isBeak: isBeak Dims: Dims objVals:objVals objName:objName objbody:objbody = 
 (
-	--Description: Makes Arms
-	--Input: arms(specific kind of arms to be made), objName (the name of the object)
-	--Outputs: Creates arms
-	--Example Call: MakeArms("Bent_Up")("Body(Oblong)+Arms(Bent_Up)") will add arms to the object thead are bent upwards
-	
-	
-	if( isBeak ) then (
+
+	if ( isBeak ) then (
+		
+		if objHasBeak() then 
+			armEnds = beakVal()
+		else 
+			armEnds = "Flat"
 		
 		if objHasBeakAngle() then 
 			arms = beakAngleVal()
 		else 
 			arms = "Straight"
-
-		if objHasBeakEnds() then 
-			armEnds = beakEndsVal()
-		else 
-			armEnds = "Flat"
 
 	) else (
 		
@@ -612,7 +727,7 @@ isBeak: isBeak Dims: Dims objVals:objVals objName:objName objbody:objbody =
 	return armOutput
 )
 
-fn TakePics Obj anglevalue camdistance picname:objName objbody: objbody headBody: headBody fileNameForPic:ExportPath = (
+fn TakePics Obj anglevalue camdistance picname:objName bodyZMax: bodyZMax bodyZMin: bodyZMin hBodyZMax: hBodyZMax fileNameForPic:ExportPath = (
 	--Description: Takes photos of objects from any angle and distance. Two photos taken of each object; one where the object is face on, and another where it is rotated 45 degrees
 	--Input: anglevalue (angle of camera above or below the ground), camdistance (distance of camera away from the object)
 	--qqArray (entire object to be photographed), fileNameforPic (the folderpath of where the photo will be saved)
@@ -640,7 +755,8 @@ fn MakeDefaultArms bendAngle objName assetPath:assetPath = (
 	include "Script_DefaultArms.ms"
 )
 
-fn MakeAlternativeArms bendAngle startradius endradius objName numberOfArms genLeft assetPath:assetPath objVals: objVals isBeak: isBeak headBody: headBody = (
+fn MakeAlternativeArms bendAngle startradius endradius objName numberOfArms 
+	genLeft assetPath:assetPath isBeak: isBeak headBody: headBody objbody: objbody armScale: armScale = (
 	--Description: Creates and adds four arms to quaddle bodies. The arms are cones which can have different diameters on each end
 	--Input: bendAngle (the amount to which the arms are bent. Positive numbers bend downwards, Negative numbers bend upward), objName,
 	--startradius (radius of base of cone embeded in object), endradius (end radius of cone sticking out of object)
@@ -660,7 +776,7 @@ fn MakeSphericalArms objName numberOfArms objbody body = (
 	include "Script_SphericalArms.ms"
 )
 
-fn MakeCustomPyramidBody pattern pyramidpercentage = (
+fn MakeCustomPyramidBody pyramidpercentage = (
 	--Description: Creates hybrid Oblong-Pyramid object
 	--Input: pattern, pyramidpercentage (how "pyramidal" the object will be)
 	--Outputs: Creates Pyramidal main body
@@ -678,7 +794,7 @@ fn MakeCustomAmalgamBody pattern pyramidpercentage oblongpercentage concaveperce
 	include "Script_CustomAmalgamBody.ms"
 )
 
-fn MakeOblongBody pattern ratio: ratio  = (
+fn MakeOblongBody ratio: ratio  = (
 	--Description: Makes Oblong main body
 	--Input: pattern
 	--Example Call: MakeOblongBody() will create the object
@@ -686,38 +802,38 @@ fn MakeOblongBody pattern ratio: ratio  = (
 	include "Script_OblongBody.ms"
 )
 
-fn MakePyramidBody pattern ratio: ratio = (
+fn MakePyramidBody ratio: ratio = (
 	include "Script_PyramidalBody.ms"
 )
 
-fn MakeOctahedronBody pattern ratio: ratio = (
+fn MakeOctahedronBody ratio: ratio = (
 	include "Script_OctahedronBody.ms"
 )	
 
-fn MakeCubicBody pattern ratio: ratio = (
+fn MakeCubicBody ratio: ratio = (
 	include "Script_CubicBody.ms"
 )
 
-fn MakeDumbbellBody pattern ratio: ratio = (
+fn MakeDumbbellBody ratio: ratio = (
 	include "Script_DumbbellBody.ms"
 )
 
-fn MakeConvexBody pattern ratio: ratio = (
+fn MakeConvexBody ratio: ratio = (
 	include "Script_ConvexBody.ms"
 )
 
-fn MakePepperBody pattern ratio: ratio = (
+fn MakePepperBody ratio: ratio = (
 	include "Script_PepperBody.ms"
 )
 
-fn MakeCompressedOblongBody pattern ratio: ratio = (
+fn MakeCompressedOblongBody ratio: ratio = (
 	include "Script_CompressedOblongBody.ms"
 )
 
-fn MakeSphereBody pattern ratio: ratio = (
+fn MakeSphereBody ratio: ratio = (
 	include "Script_SphereBody.ms"
 )
 
-fn MakeConcaveBody pattern ratio: ratio  = (
+fn MakeConcaveBody ratio: ratio  = (
 	include "Script_ConcaveBody.ms"
 )

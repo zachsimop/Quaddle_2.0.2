@@ -1,0 +1,13 @@
+Asset Data
+Body: <"Cubic","Oblong","Pyramidal","Sphere","Compressed_Oblong","Octahedron","Pepper","Concave","Convex">
+Aspect_Ratio: <"Null","Long","Short">
+Colour: <"Grey","More_Red","More_Orange">
+Pattern: <"No Pattern","Diamond","Checkered">
+Arm_Count: < "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10">
+Arm_Ends: <"Flat", "Blunt", "Pointed", "Flared">
+Arm_Angle: <"Straight","Bent_Up","Bent_Down">
+Icon: <"No Icon","Circle_0.png","Circle_1.png","Square_0.png","Square_1.png","Triangle_0.png","Triangle_1.png","Pentagon_0.png","Pentagon_1.png","Cross_0.png","Cross_1.png","HourGlass_0.png","HourGlass_1.png","Raindrop_0.png","Raindrop_1.png","Leaf_0.png","Leaf_1.png">
+Fractal: <"No Fractal","f (1).png","f (2).png","f (3).png","f (4).png","f (5).png","f (6).png","f (7).png","f (8).png","f (9).png","f (10).png","f (11).png","f (12).png","f (13).png","f (14).png","f (15).png","f (16).png","f (17).png","f (18).png","f (19).png","f (20).png","f (21).png","f (22).png","f (23).png","f (24).png","f (25).png","f (26).png","f (27).png","f (28).png","f (29).png","f (30).png","f (31).png","f (32).png","f (33).png","f (34).png","f (35).png","f (36).png","f (37).png","f (38).png","f (39).png","f (40).png","f (41).png","f (42).png","f (43).png","f (44).png","f (45).png","f (46).png","f (47).png","f (48).png","f (49).png","f (50).png","f (51).png","f (52).png","f (53).png","f (54).png","f (55).png","f (56).png","f (57).png","f (58).png","f (59).png","f (60).png","f (61).png","f (62).png","f (63).png","f (64).png","f (65).png","f (66).png","f (67).png","f (68).png","f (69).png","f (70).png","f (71).png","f (72).png","f (73).png","f (74).png","f (75).png","f (76).png","f (77).png","f (78).png","f (79).png","f (80).png","f (81).png","f (82).png","f (83).png","f (84).png","f (85).png","f (86).png","f (87).png","f (88).png","f (89).png","f (90).png","f (91).png","f (92).png","f (93).png","f (94).png">
+Head: <"No Head","Cubic","Oblong","Pyramidal","Sphere","Compressed_Oblong","Octahedron","Pepper","Concave","Convex">
+Beak: <"No Beak","Flat", "Blunt", "Pointed", "Flared">
+Beak_Angle: <"Straight","Bent_Up","Bent_Down">

@@ -25,10 +25,21 @@
 --HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT
 --OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+copyrightSchpiel = "QuaddleGenerator\n\n" + \
+"Copyright \xa9 2017 Milad Naghizadeh, Marcus Watson, Ben Voloh, Thilo Womelsdorf, Attention Circuits Control Lab\n\n" + \
+"Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\")," + \
+"to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies" + \
+" of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\n" + \
+"The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\n" + \
+"THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE" + \
+" WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT" + \
+" HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT" + \
+" OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n\n"
+print copyrightSchpiel
+
 --Functions are in other script
 fileIn "FunctionsList.ms"
 fileIn "Helper_Functions.ms"
-fileIn "Init.ms"
 
 clearListener()
 
@@ -38,13 +49,14 @@ rof=newrolloutfloater "Copyright notice" 800 300
 rollout copyRight "Copyright License" width:800 height:300
 	
 (
-	label 'mitInfo' "Yo" pos:[39,13] width:731 height:209 style_sunkenedge:false align:#left
+	label 'mitInfo' copyrightSchpiel pos:[39,13] width:731 height:209 style_sunkenedge:false align:#left
 	button 'continueButton' "Go"
 	on continueButton pressed do
 	(
 		(
 			
-			preferencePath = "C:\\Users\\zachs\\Documents\\Lab\\Quaddle_2.0.2\\Quaddle_Generator\\Test Driver\\Assets & Object Table\\Preferences.txt"
+			--Where you enter your Path!
+			generatorPath = "C:\\Users\\zachs\\Documents\\Lab\\Quaddle_2.0.2\\Quaddle_Generator\\Test Driver\\"
 			
 			loadInPathsFilesAndPreferences()
 			loadInConstantsAndDefaults()
@@ -52,21 +64,12 @@ rollout copyRight "Copyright License" width:800 height:300
 			
 			readyToGo = checkForErrors()
 			
-			if (readyToGo) then (
+			if readyToGo then (
 				
-				for iter = 1 to dimSet.count do (
-					
-					Dims = deepCopy dimSet[1]
-					Vals = deepCopy valSet[1]
-					
-					objVals = initObjVals(Vals)
-					
-					generateObjects(1)
-					
-					deleteItem dimSet 1
-					deleteItem valSet 1
-					
-				)
+				objVals = initObjVals()
+				tempDims = deepCopy Dims
+				
+				createObjects()
 				
 			) else (
 				

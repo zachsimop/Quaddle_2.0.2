@@ -42,11 +42,12 @@
 	branchPath= assetPath + "Patterns and Colours\\" + "70_70_70" + ".png"
 	arm.material = standardMaterial diffuseMap:(Bitmaptexture fileName: (branchPath)) showInViewport:true;
 	rotate arm (eulerangles 0 90 0)
-	protrusionAmount = 5
+		
 	local listOfArms = #(arm)
 	if ( isBeak == true ) then (
 		
 		scale arm [0.5,0.5,0.5]
+		
 		local offsetVal = 2.5
 		if(objVals[findItem Dims "Head"] == "Cubic") then (
 			offsetVal = 7.25
@@ -62,6 +63,12 @@
 	if( isBeak == false ) then (
 		--local listOfArms = #(arm,instance arm,instance arm,instance arm)
 
+		scale arm [armScale,armScale,armScale]
+		
+		protrusionAmount = objbody.max[2] / 2.1
+		if bodyVal() == "Concave" then
+			protrusionAmount = objbody.max[2] / 2.5
+		
 		if numberOfArms != 0 then (
 			
 			if genLeft == true or numberOfArms != 1 then (
@@ -98,15 +105,16 @@
 			
 				if (numberOfArms >= 3) then (
 					append listOfArms (instance arm)
-					rotate listOfArms[3] (eulerangles 0 0 90)
+					rotate listOfArms[3] (eulerangles 0 0 -90)
 				)
 			
 				if (numberOfArms >= 4) then (
 					append listOfArms (instance arm)
-					rotate listOfArms[4] (eulerangles 0 0 -90)
+					rotate listOfArms[4] (eulerangles 0 0 90)
 				)
 			
 			)
+			
 		) else (
 			delete arm
 			deleteItem listOfArms 1
