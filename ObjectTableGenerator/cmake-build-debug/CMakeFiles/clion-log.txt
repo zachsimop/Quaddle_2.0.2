@@ -1,4 +1,0 @@
-"C:\Program Files\JetBrains\CLion 2021.1.2\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=C:/msys64/mingw64/bin/clang++.exe -G "CodeBlocks - MinGW Makefiles" C:\Users\zachs\Documents\Lab\Quaddle_2.0.1\ObjectTableGenerator
--- Configuring done
--- Generating done
--- Build files have been written to: C:/Users/zachs/Documents/Lab/Quaddle_2.0.1/ObjectTableGenerator/cmake-build-debug
