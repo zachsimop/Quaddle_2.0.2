@@ -1,5 +1,5 @@
 Body: 	      [0]
-Smoothness:   [none]
+Smoothness:   [6]
 Aspect_Ratio: [0]
 Main Colour:  [none]
 Comp Colour:  [none]

@@ -48,7 +48,7 @@ fn createObjects Dims: Dims = (
 					
 					
 					if isMutuallyExclusive(y) then 
-						Dims[y] = "N/A"
+						Dims[y] = noGen
 					
 				)
 				
@@ -58,14 +58,14 @@ fn createObjects Dims: Dims = (
 				if Dims[iter] == "Main_Colour" then (
 					
 					if Dims[iter + 1] == "Comp_Colour" then
-						Dims[iter + 1] = "N/A"
+						Dims[iter + 1] = noGen
 					
 					if Dims[iter + 2] == "Pattern" then
-						Dims[iter + 2] = "N/A"
+						Dims[iter + 2] = noGen
 					
 				)
 				
-				Dims[iter] = "N/A"
+				Dims[iter] = noGen
 				
 			)
 			
@@ -92,14 +92,14 @@ fn generateQuaddles dimCount Dims: Dims = (
 		
 		objVals[dimCount] = Vals[dimCount][valCount]
 		
-		--Base Case
 		if dimCount != Vals.count then (
 			
 			--avoids iterating through mututally exclusive Vals
 			nextDim = 1
-			while Dims[dimCount + nextDim] == "N/A" do
+			while Dims[dimCount + nextDim] == noGen do
 				nextDim = nextDim + 1
 			
+			--avoids the case where the program iterates outside the index of Dims
 			if Dims[dimCount+nextDim] != undefined then
 				generateQuaddles(dimCount+nextDim)
 			else
@@ -575,7 +575,7 @@ assetPath:assetPath Dims:Dims Vals:Vals bodyHeight: bodyHeight isHair: isHair = 
 		
 		--Get relevant values to position the Icon correctly on a given body
 		hrApp = DEFAULT_HR; angleApp = DEFAULT_ANGLES
-		if bodyVal() == "Cubic" then
+		if bodyVal() == "Cubic" and not isHair then
 			angleApp = CUBIC_ANGLES
 		else if bodyVal() == "Pyrimidal" then
 			hrApp = PYRIMIDAL_HR
@@ -588,9 +588,13 @@ assetPath:assetPath Dims:Dims Vals:Vals bodyHeight: bodyHeight isHair: isHair = 
 		--ANOTHER NOTE: MaxScript can only access it in modify mode. hence the code above.
 		
 		addmodifier body myMap 
+		
 		myMap.gizmo.rotation = angleApp
-		if not isHair then
+		
+		if not isHair then (
 			myMap.gizmo.position = [0,0,bodyHeight/hrApp]
+		)
+		
 		deselect body
 		
 	) else (
@@ -905,6 +909,8 @@ bodyHeight: bodyHeight =
 		objectHair = addingHair.ConvertToMesh instance:objbody
 		objectHair.name = "body" + "_hair"
 		
+		
+		
 		--applying object material to object, if it has one
 		isHair = true
 		if objHasIcon() then (
@@ -923,7 +929,7 @@ bodyHeight: bodyHeight =
 		else (
 			
 			objectHair.material = standardMaterial diffuseMap:(outMap) showInViewport:true;
-			ApplyTexture(objectHair)
+			ApplyColouredTexture(objectHair)
 			
 		)
 		isHair = false

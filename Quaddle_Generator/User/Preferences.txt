@@ -5,11 +5,11 @@ Your Preferences
 Specify Your Own Paths: Off
 (Options: On, Off)
 
-Script Path: C:\Users\zachs\Documents\Lab\Quaddle_2.0.2\Quaddle_Generator\Test Driver\Scripts\
+Script Path: 
 
-Asset Path:  C:\Users\zachs\Documents\Lab\Quaddle_2.0.2\Quaddle_Generator\Test Driver\Assets\
+Asset Path:  
 
-Export Path: C:\Users\zachs\Documents\Lab\Quaddle_2.0.2\images\
+Export Path:
 
 -----------------------------------------------------
 
@@ -40,7 +40,7 @@ Apply Smoothness to Head: On
 Apply Smoothness to Body: On
 (Options: On, Off)
 
-Print Objects that are Not Possible: Off
+Print Objects that are Not Possible: On
 (Options: On, Off)
 
 ------------------------------------------------------

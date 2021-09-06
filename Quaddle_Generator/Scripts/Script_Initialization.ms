@@ -194,6 +194,102 @@ str dimVal: dimVal Vals: Vals Dims:Dims counter: counter = (
 	
 )
 
+--INIT HELPER FUNCTIONS
+--The Following 3 functions navigate asset data.txt
+
+--nextVal allows you to traverse the values of a dimension via the ' " ' 
+--	character. It is slightly deceptvive since in order to really go to the
+--	next value, you must do it twice (since there are two quotations per value),
+--	as you see in gotoVal(); however, this allows for better contol over 
+--	traversing the program with less code.
+fn nextVal = (
+	
+	skipToString data "\""
+	
+)
+
+--Tells you when you've reached the end of a line, and respectively, a dimension
+--	since one line represents a dimension. 
+fn endOfLine =(
+	
+	return (readChar data) == ">"
+	
+)
+
+-- Takes you to the respective value on the entered number in the dimension.
+fn gotoVal s = (
+	
+	--parses double digit numbers
+	loc = determineNum(s)
+	
+	if (loc != 0) then (
+		
+		for i = 1 to (loc*2) do 
+			nextVal()
+		
+	)
+	
+)
+
+--Checks if dimension will be used
+fn doNotUseDim s = (
+	
+	return s == "none"
+	
+)
+
+--Checks if every value of dimension will be used
+fn useAllValsInDim s = (
+	
+	return s == "all"
+	
+)
+
+--Checks if a range is specified
+fn isRange s = (
+	
+	return findString s "-" != undefined 
+	
+)
+
+--determines the value of a number
+fn determineNum n = (
+	
+	--Determines if it is a double digit number
+	if (n.count > 1 and n[2] as integer != undefined) then 
+		returnNum = (substring n 1 2)
+	else 
+		returnNum = n[1]
+	
+	return returnNum as integer
+	
+)
+
+--Puts the file curosor at the beginning of the line of whatever
+--	dimension the program is at
+fn resetPosInFile = (
+	
+	seek data 0
+	for i = 1 to counter*2 do 
+		skipToNextLine data
+
+)
+
+--Finds the max number of values in a given dimension
+--	used for syntax error
+fn findMaxVal = (
+	
+	resetPosInFile()
+	local num = 0
+	while not endOfLine() do (
+		num = num + 1
+		nextVal()
+	)
+	
+	return num/2 
+	
+)
+
 --Description: Recieves the user values determined by getUserData() then uses that info
 --					to fetch the corresponding Dimension and Value from asset table.txt
 --Input: all implicit
@@ -216,15 +312,18 @@ fn addDataToArray dimVal:dimVal Vals: Vals = (
 --Example Call: modifyArmCount()
 fn modifyArmCount = (
 	
-	if objHasArmCount() then
-	if (findItem Vals[ getArmCountLoc() ] "1" != 0) then (
-
-		if singleArmLoc == "Left" or singleArmLoc == "Both" then (
-			insertItem "1L" (Vals[  getArmCountLoc()  ]) (findItem Vals[  getArmCountLoc()  ] "1")
+	if objHasArmCount() then (
+		
+		if (findItem Vals[ getArmCountLoc() ] "1" != 0) then (
+			
+			if singleArmLoc == "Left" or singleArmLoc == "Both" then
+				insertItem "1L" (Vals[  getArmCountLoc()  ]) (findItem Vals[  getArmCountLoc()  ] "1")
+			
+			if singleArmLoc == "Right" or singleArmLoc == "Both" then
+				insertItem "1R"  (Vals[  getArmCountLoc()  ] ) (findItem Vals[ getArmCountLoc() ] "1")
+			deleteItem (Vals[ getArmCountLoc() ]) (findItem Vals[ getArmCountLoc() ] "1")
+			
 		)
-		if singleArmLoc == "Right" or singleArmLoc == "Both" then
-			insertItem "1R"  (Vals[  getArmCountLoc()  ] ) (findItem Vals[ getArmCountLoc() ] "1")
-		deleteItem (Vals[ getArmCountLoc() ]) (findItem Vals[ getArmCountLoc() ] "1")
 		
 	)
 
@@ -303,18 +402,6 @@ Dims: Dims goodSyntax: goodSyntax = (
 		
 	)
 	
--- 	if objHasPattern() and objHasCompColour() and objHasMainColour()  then (
--- 		
--- 		mybool = verifyColourCombos(1)
--- 		print mybool
--- 		
--- 		if mybool == false then (
--- 			messageBox "There must be one comboniation of main colour, comp colour, and pattern that exists"
--- 			return mybool
--- 		)
--- 		
--- 	)
-	
 	if not objHasArmCount() and
 	   ( objHasArmAngle() or objHasArmEnds() ) then (
 		
@@ -328,14 +415,6 @@ Dims: Dims goodSyntax: goodSyntax = (
 	  ( objHasBeakEnds() or objHasBeakAngle() ) then (
 		
 		messageBox "You must have a Head to have a Beak or Beak Angle"
-		mybool = false
-		return mybool
-		
-	)
-	
-	if not objHasArmCount() and objHasArmAngle() then (
-		
-		messageBox "You must have an Arm to have an Arm Angle"
 		mybool = false
 		return mybool
 		

@@ -201,6 +201,7 @@ fn loadInConstantsAndDefaults = (
 	global numOfObjects = 0
 	global isHair = false
 	global isHead = false
+	global noGen = "N/A"
 	
 )
 
@@ -348,102 +349,6 @@ fn loadFractalFiles startVal endVal = (
 
 )
 
---INIT HELPER FUNCTIONS
---The Following 3 functions navigate asset data.txt
-
---nextVal allows you to traverse the values of a dimension via the ' " ' 
---	character. It is slightly deceptvive since in order to really go to the
---	next value, you must do it twice (since there are two quotations per value),
---	as you see in gotoVal(); however, this allows for better contol over 
---	traversing the program with less code.
-fn nextVal = (
-	
-	skipToString data "\""
-	
-)
-
---Tells you when you've reached the end of a line, and respectively, a dimension
---	since one line represents a dimension. 
-fn endOfLine =(
-	
-	return (readChar data) == ">"
-	
-)
-
--- Takes you to the respective value on the entered number in the dimension.
-fn gotoVal s = (
-	
-	--parses double digit numbers
-	loc = determineNum(s)
-	
-	if (loc != 0) then (
-		
-		for i = 1 to (loc*2) do 
-			nextVal()
-		
-	)
-	
-)
-
---Checks if dimension will be used
-fn doNotUseDim s = (
-	
-	return s == "none"
-	
-)
-
---Checks if every value of dimension will be used
-fn useAllValsInDim s = (
-	
-	return s == "all"
-	
-)
-
---Checks if a range is specified
-fn isRange s = (
-	
-	return findString s "-" != undefined 
-	
-)
-
---determines the value of a number
-fn determineNum n = (
-	
-	--Determines if it is a double digit number
-	if (n.count > 1 and n[2] as integer != undefined) then 
-		returnNum = (substring n 1 2)
-	else 
-		returnNum = n[1]
-	
-	return returnNum as integer
-	
-)
-
---Puts the file curosor at the beginning of the line of whatever
---	dimension the program is at
-fn resetPosInFile = (
-	
-	seek data 0
-	for i = 1 to counter*2 do 
-		skipToNextLine data
-
-)
-
---Finds the max number of values in a given dimension
---	used for syntax error
-fn findMaxVal = (
-	
-	resetPosInFile()
-	local num = 0
-	while not endOfLine() do (
-		num = num + 1
-		nextVal()
-	)
-	
-	return num/2 
-	
-)
-
 --Determines the number of mutually exclusive values in a given
 --	generation
 fn numOfME Dims: Dims = (
@@ -497,8 +402,8 @@ dimCount: dimCount objVals: objVals assetPath:assetPath objName: objName
 allObjects: allObjects= (
 	
 	--verify a version has not been created
-	if findItem allObjects objName != 0 then
-		return false
+-- 	if findItem allObjects objName != 0 then
+-- 		return false
 
 	--verify the patterns are compatible
 	if not objHasMainColour() or not objHasCompColour() or not objHasPattern() then 
