@@ -12,7 +12,7 @@
 
 --Scripts, objects and in depth manual available on github: https://github.com/att-circ-contrl/Quaddles-Gen
 
---Copyright (C) 2017 Milad Naghizadeh, Marcus Watson, Ben Voloh, Thilo Womelsdorf, Attention Circuits Control Lab
+--Copyright (C) 2021 Milad Naghizadeh, Marcus Watson, Ben Voloh, Thilo Womelsdorf, Attention Circuits Control Lab
 
 --Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
 --to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
