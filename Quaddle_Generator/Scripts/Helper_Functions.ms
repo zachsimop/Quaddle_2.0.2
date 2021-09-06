@@ -1,3 +1,15 @@
+-- Attention-Circuits-Control L
+--Laboratory (www.attention-circuits-control.org) --
+
+--For more information on how Quaddles are generated and may be used:
+-- Simopoulos, Z., Watson, MR., Voloh, B., Naghizadeh, M., Womelsdorf, T., (2021) “Quaddles: A multidimensional 3D object set with parametrically-controlled
+-- and customizable features” Behav Res Methods.
+
+--Website guide: http://accl.psy.vanderbilt.edu/resources/analysis-tools/3d-image-material/
+--Brief instructions on how to use scripts: http://accl.psy.vanderbilt.edu/quaddlegenerator-brief-instructions/
+
+--Scripts, objects and in depth manual available on github: https://github.com/att-circ-contrl/Quaddles-Gen
+
 clearListener()
 
 --Description: Loads in Paths given by Prefrences.txt and then other values specified in the text file

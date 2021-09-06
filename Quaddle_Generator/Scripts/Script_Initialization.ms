@@ -2,7 +2,7 @@
 --Laboratory (www.attention-circuits-control.org) --
 
 --For more information on how Quaddles are generated and may be used:
---Watson, MR., Voloh, B., Naghizadeh, M., Womelsdorf, T., (2018) “Quaddles: A multidimensional 3D object set with parametrically-controlled
+-- Simopoulos, Z., Watson, MR., Voloh, B., Naghizadeh, M., Womelsdorf, T., (2021) “Quaddles: A multidimensional 3D object set with parametrically-controlled
 -- and customizable features” Behav Res Methods.
 
 --Website guide: http://accl.psy.vanderbilt.edu/resources/analysis-tools/3d-image-material/
