@@ -12,7 +12,10 @@
 
 	--makes blunted and sharp arms(
 	
-	local arm= Cone()
+	if numberOfArms == 0 then 
+		return null
+	
+	arm= Cone()
 	
 	arm.radius1 = startradius
 	arm.radius2 = endradius
@@ -43,8 +46,8 @@
 	arm.material = standardMaterial diffuseMap:(Bitmaptexture fileName: (branchPath)) showInViewport:true;
 	rotate arm (eulerangles 0 90 0)
 		
-	local listOfArms = #(arm)
-	if ( isBeak == true ) then (
+	
+	if isBeak then (
 		
 		scale arm [0.5,0.5,0.5]
 		
@@ -58,66 +61,92 @@
 		
 		arm.pos = [(headBody.max[1] - offsetVal),0,((headBody.max[3] + headBody.min[3])/2)]
 		
-	) 
-	
-	if( isBeak == false ) then (
-		--local listOfArms = #(arm,instance arm,instance arm,instance arm)
+		rotAmount = 360 / numberOfArms
 
+		arm.pivot = [0,0,((headBody.max[3] + headBody.min[3])/2)]
+		
+		listOfArms = #(arm)
+		
+		if (numberOfArms >= 5) then (
+			
+			for i = 2 to numberOfArms + 1 do (
+				
+				append listOfArms (instance arm)
+				rotate listOfArms[i] (eulerangles 0 0 (i*rotAmount))
+				
+			)
+			
+		) else (
+		
+			if (numberOfArms >= 2) then (
+				append listOfArms (instance arm)
+				rotate listOfArms[2] (eulerangles 0 0 -90)
+				rotate listOfArms[1] (eulerangles 0 0 90)
+			)
+		
+			if (numberOfArms >= 3) then (
+				append listOfArms (instance arm)
+				rotate listOfArms[3] (eulerangles 0 0 -90)
+			)
+		
+			if (numberOfArms >= 4) then (
+				append listOfArms (instance arm)
+				rotate listOfArms[4] (eulerangles 0 0 90)
+			)
+		
+		)
+	)		
+	
+	--if( isBeak == false ) then (
+		--local listOfArms = #(arm,instance arm,instance arm,instance arm)
+	else (
 		scale arm [armScale,armScale,armScale]
 		
 		protrusionAmount = objbody.max[2] / 2.1
 		if bodyVal() == "Concave" then
 			protrusionAmount = objbody.max[2] / 2.5
+			
+		if genLeft == true or numberOfArms != 1 then (
+			arm.pos = [0, -protrusionAmount, 0]
+			rotate arm (eulerangles 180 0 -90)
+		)
+		if genLeft == false then (
+			arm.pos = [0, protrusionAmount, 0]
+			rotate arm (eulerangles 180 0 90)
+			
+		)
 		
-		if numberOfArms != 0 then (
-			
-			if genLeft == true or numberOfArms != 1 then (
-				arm.pos = [0, -protrusionAmount, 0]
-				rotate arm (eulerangles 180 0 -90)
-			)
-			if genLeft == false then (
-				arm.pos = [0, protrusionAmount, 0]
-				rotate arm (eulerangles 180 0 90)
-				
-			)
-			
-			rotAmount = 360 / numberOfArms
+		rotAmount = 360 / numberOfArms
 
-			arm.pivot = [0,0,0]
+		arm.pivot = [0,0,0]
+		
+		listOfArms = #(arm)
+		
+		if (numberOfArms >= 5) then (
 			
-			listOfArms = #(arm)
-			
-			if (numberOfArms >= 5) then (
+			for i = 2 to numberOfArms + 1 do (
 				
-				for i = 2 to numberOfArms + 1 do (
-					
-					append listOfArms (instance arm)
-					rotate listOfArms[i] (eulerangles 0 0 (i*rotAmount))
-					
-				)
+				append listOfArms (instance arm)
+				rotate listOfArms[i] (eulerangles 0 0 (i*rotAmount))
 				
-			) else (
-			
-				if (numberOfArms >= 2) then (
-					append listOfArms (instance arm)
-					rotate listOfArms[2] (eulerangles 0 0 180)
-				)
-			
-				if (numberOfArms >= 3) then (
-					append listOfArms (instance arm)
-					rotate listOfArms[3] (eulerangles 0 0 -90)
-				)
-			
-				if (numberOfArms >= 4) then (
-					append listOfArms (instance arm)
-					rotate listOfArms[4] (eulerangles 0 0 90)
-				)
-			
 			)
 			
 		) else (
-			delete arm
-			deleteItem listOfArms 1
+		
+			if (numberOfArms >= 2) then (
+				append listOfArms (instance arm)
+				rotate listOfArms[2] (eulerangles 0 0 180)
+			)
+		
+			if (numberOfArms >= 3) then (
+				append listOfArms (instance arm)
+				rotate listOfArms[3] (eulerangles 0 0 -90)
+			)
+		
+			if (numberOfArms >= 4) then (
+				append listOfArms (instance arm)
+				rotate listOfArms[4] (eulerangles 0 0 90)
+			)
 		)
 	)
 -- 	rotate listOfArms[1] (eulerangles 0 90 0)

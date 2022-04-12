@@ -16,7 +16,7 @@
 clearListener()
 
 --change to true if you want to debug this file
-testing = false
+testing = true
 
 if testing then 
 	loadInAssets()
@@ -35,8 +35,7 @@ fn loadInAssets = (
 		singleArmLoc = "Both"
 	)
 	
-	goodSyntax = getUserData()				
-	
+	getUserData()
 	print "***DIMS***"
 	print Dims
 	print "***VALS***"
@@ -386,17 +385,33 @@ Dims: Dims goodSyntax: goodSyntax = (
 		
 	)
 	
-	if objHasCompColour() and not objHasMainColour() then (
+	if objHasBodyCompColour() and not objHasBodyMainColour() then (
 		
-		messageBox "You must have Main Colour if you have a Comp Colour"
+		messageBox "You must have Main Body Colour if you have a Comp Body Colour"
+		mybool = false
+		return mybool 
+		
+	)
+	
+	if objHasHeadCompColour() and not objHasHeadMainColour() then (
+		
+		messageBox "You must have Main Head Colour if you have a Comp Head Colour"
+		mybool = false
+		return mybool 
+		
+	)
+	
+	if objHasBodyPattern() and (not objHasBodyCompColour() or not objHasBodyMainColour() ) then (
+		
+		messageBox "You must have both main and comp body colours to have a body pattern"
 		mybool = false
 		return mybool
 		
 	)
 	
-	if objHasPattern() and (not objHasCompColour() or not objHasMainColour() ) then (
+	if objHasHeadPattern() and (not objHasHeadCompColour() or not objHasHeadMainColour() ) then (
 		
-		messageBox "You must have both main and comp colours to have a pattern"
+		messageBox "You must have both main and comp head colours to have a head pattern"
 		mybool = false
 		return mybool
 		

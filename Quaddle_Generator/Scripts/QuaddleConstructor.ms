@@ -1,4 +1,4 @@
--- Attention-Circuits-Control L
+--Attention-Circuits-Control L
 --Laboratory (www.attention-circuits-control.org) --
 
 --For more information on how Quaddles are generated and may be used:
@@ -39,9 +39,9 @@ fn createObjects Dims: Dims = (
 				
 				for y = iter+1 to Dims.count do (
 					
-					if Dims[iter] == "Main_Colour" then ( 
+					if Dims[iter] == "BMain_Colour" then ( 
 						
-						while (Dims[y] == "Pattern" or Dims[y] == "Comp_Colour") do
+						while (Dims[y] == "BPattern" or Dims[y] == "BComp_Colour") do
 							y = y + 1
 						
 					)
@@ -55,19 +55,19 @@ fn createObjects Dims: Dims = (
 				generateQuaddles(1)
 				
 				resetDims(iter)
-				if Dims[iter] == "Main_Colour" then (
+				if Dims[iter] == "BMain_Colour" then (
 					
-					if Dims[iter + 1] == "Comp_Colour" then
+					if Dims[iter + 1] == "BComp_Colour" then
 						Dims[iter + 1] = noGen
 					
-					if Dims[iter + 2] == "Pattern" then
+					if Dims[iter + 2] == "BPattern" then
 						Dims[iter + 2] = noGen
 					
 				)
 				
 				Dims[iter] = noGen
 				
-			)
+			)--
 			
 		)
 		
@@ -291,10 +291,17 @@ Dims:Dims objVals:objVals assetPath:assetPath  percentages: percentages dimCount
 fn MakeBody 
 body objName:objName percentages: percentages ratio: ratio = (
 	
-	if objHasPattern() then 
-		local pattern = patternVal()
-	else
-		local pattern = "None"
+	if (isHead) then (
+		if objHasHeadPattern() then 
+			local pattern = HeadPatternVal()
+		else
+			local pattern = "None"
+	) else (
+		if objHasBodyPattern() then 
+			local pattern = BodyPatternVal()
+		else
+			local pattern = "None"
+	)
 		
 	if (body == "Oblong") then (
 		
@@ -430,32 +437,63 @@ assetPath:assetPath Dims:Dims Vals:Vals isHead: isHead = (
 		invertText = ""
 	
 	--Determine proper material application given colour and pattern
-	if not objHasPattern() then 
-		local pattern = "Solid"
-	else
-		local pattern = patternVal()
+	local pattern;
+	
+	--If its the head and there is no Pattern and Main Colour or its the body
+	--then apply body patterns and colours
+	--	Note that Comp colour does not need to be checked because its
+	--	checked in check for errors
+	--otherwise apply the head patterns and colours
+	if ( (isHead and not objHasHeadPattern() and not objHasHeadMainColour() )or
+		(not isHead) ) then (
 		
-	--Determine Colour
-	if not objHasMainColour() and not objHasCompColour() and pattern == "Solid" then
-		colour = (greyColour + "_" + greyColour)
-	
-	else if not objHasMainColour() and not objHasCompColour() and pattern != "Solid" then
-		colour = "7000000_5000000"
-	
-	else if objHasMainColour() and not objHasCompColour() and pattern == "Solid" then 
-		colour = mainColourVal() + "_" + mainColourVal()
-	
-	else if objHasMainColour() and not objHasCompColour() and pattern != "Solid" then (
+		pattern = BodyPatternVal();
+		--Determine Colour
+		if not objHasBodyMainColour() and not objHasBodyCompColour() and pattern == "Solid" then
+			colour = (greyColour + "_" + greyColour)
 		
-		colour = mainColourVal() + "_5000000"
+		else if not  objHasBodyMainColour() and not objHasBodyCompColour() and pattern != "Solid" then
+			colour = "7000000_5000000"
+		
+		else if  objHasBodyMainColour() and not objHasBodyCompColour() and pattern == "Solid" then 
+			colour = BodyMainColourVal() + "_" + BodyMainColourVal()
+		
+		else if  objHasBodyMainColour() and not objHasBodyCompColour() and pattern != "Solid" then (
+			
+			colour = BodyMainColourVal() + "_5000000"
+		)
+		
+		else (
+			colour = ( BodyMainColourVal() + "_" + BodyCompColourVal() )
+		)
 	)
-	
+		
+	--Handle Head
 	else (
-		colour = ( mainColourVal() + "_" + compColourVal() )
+		
+		pattern = HeadPatternVal();
+		if not objHasHeadMainColour() and not objHasHeadCompColour() and pattern == "Solid" then
+			colour = (greyColour + "_" + greyColour)
+		
+		else if not  objHasHeadMainColour() and not objHasHeadCompColour() and pattern != "Solid" then
+			colour = "7000000_5000000"
+		
+		else if  objHasHeadMainColour() and not objHasHeadCompColour() and pattern == "Solid" then 
+			colour = HeadMainColourVal() + "_" + HeadMainColourVal()
+		
+		else if  objHasHeadMainColour() and not objHasHeadCompColour() and pattern != "Solid" then (
+			
+			colour = HeadMainColourVal() + "_5000000"
+		)
+		
+		else (
+			colour = ( HeadMainColourVal() + "_" + HeadCompColourVal() )
+		)
+		
 	)
 	
 	texturePath= pcPath + "Pattern(" + pattern + ")+Colour(" + colour + ")" + invertText + ".png"
-	
+	--print texturePath
 	if getFiles texturePath == 0 then (
 		textureOutput = "Invalid Texture"
 		return textureOutput
@@ -626,6 +664,11 @@ isBeak: isBeak Dims: Dims objVals:objVals objName:objName objbody:objbody =
 			arms = beakAngleVal()
 		else 
 			arms = "Straight"
+		
+		if objHasBeakCount() then
+			numberOfArms = beakCountVal();
+		else
+			numberOfArms = 0;
 
 	) else (
 		
@@ -640,7 +683,7 @@ isBeak: isBeak Dims: Dims objVals:objVals objName:objName objbody:objbody =
 			armEnds = "Flat"
 		
 		--the number of arms on the object is specificied by "ArmCount". If it's not present then the number of arms is set to 4
-		if objHasArmCount() then (
+		if objHasArmCount() and not isBeak then (
 			
 			if  armCountVal() == "1L" or armCountVal() == "1R" then (
 				

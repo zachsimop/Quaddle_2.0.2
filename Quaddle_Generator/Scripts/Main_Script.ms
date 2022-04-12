@@ -60,8 +60,9 @@ rollout copyRight "Copyright License" width:800 height:300
 			--Where you enter your Path!
 			generatorPath = "C:\\Users\\zachs\\Documents\\Lab\\Quaddle_2.0.2\\Quaddle_Generator\\"
 			
+			--sdf
 			loadInPathsFilesAndPreferences()
-			loadInAssets()
+			loadInAssets() 
 			loadInConstantsAndDefaults()
 			
 			readyToGo = checkForErrors()

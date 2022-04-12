@@ -40,20 +40,22 @@ cam.position.controller = pc --camera  movement constrained to path constraint
 --since camera is locked to path constraint of the circle, rotating circle will move camera
 viewport.setType #view_camera
 anglestring = anglevalue as string
-fileNameForPic =  fileNameForPic + "pictures\\" + anglestring
+fileNameForPic2 =  fileNameForPic + "pictures\\" + anglestring
+fileNameForPic = fileNameForPic + "pictures\\" + 0 as string
 makeDir fileNameForPic
+makeDir fileNameForPic2
 
 --smoothhighlights is a render setting
 viewport.SetRenderLevel #smoothhighlights
-picturelocation = fileNameForPic + "\\" + anglestring + "_0deg_rotation_" + picname + ".jpg"
+--picturelocation = fileNameForPic + "\\" + anglestring + "_0deg_rotation_" + picname + ".jpg"
 picturelocation = fileNameForPic + "\\" + anglestring + "_0deg_rotation_" + picname + ".png"
 
 render outputFile: (picturelocation) vfb: off outputSize: [1280,720]
 
 
 rotate Obj (eulerAngles 0 0 45)
-picturelocation = fileNameForPic + "\\" + anglestring + "_45deg_rotation_" + picname + ".jpg"
-picturelocation = fileNameForPic + "\\" + anglestring + "_45deg_rotation_" + picname + ".png"
+--picturelocation = fileNameForPic2 + "\\" + anglestring + "_45deg_rotation_" + picname + ".jpg"
+picturelocation = fileNameForPic2 + "\\" + anglestring + "_45deg_rotation_" + picname + ".png"
 
 render outputFile: (picturelocation) vfb: off outputSize: [1280,720]
 

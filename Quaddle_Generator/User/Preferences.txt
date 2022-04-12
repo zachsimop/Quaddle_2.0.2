@@ -2,18 +2,18 @@ Your Preferences
 
 -----------------------------------------------------
 
-Specify Your Own Paths: Off
+Specify Your Own Paths: On
 (Options: On, Off)
 
-Script Path: 
+Script Path: C:\Users\zachs\Documents\Lab\Quaddle_2.0.2\Quaddle_Generator\Scripts
 
-Asset Path:  
+Asset Path:  C:\Users\zachs\Documents\Lab\Quaddle_2.0.2\Quaddle_Generator\Assets\
 
-Export Path:
+Export Path: D:\Quaddle_Repo\Simple_1\
 
 -----------------------------------------------------
 
-Export PNGs: Off
+Export PNGs: On
 (Options: On, Off)
 
 Picture Angle: 20
@@ -22,13 +22,13 @@ Picture Angle: 20
 Export fbxs: On
 (Options: On, Off)
 
-Grey Colour: Dark
+Grey Colour: Light
 (Options: Light, Dark)
 
 Location of Single Arm: Both
 (Options: Left, Right, Both)
 
-Keep Icons and Fractals Visible: On
+Keep Icons and Fractals Visible: Off
 (Options: On, Off)
 
 Apply Apspect Ratio to Head: Off

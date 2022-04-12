@@ -29,6 +29,10 @@ fn loadInPathsFilesAndPreferences generatorPath: generatorPath = (
 		objTable = openFile (generatorPath + "User\\Object Table.txt")
 		data = openFile (assetPath + "Asset Data.txt")
 		
+		print assetPath
+		print exportPath
+
+		
 	) else (
 		
 		sysInfo.currentdir = generatorPath + "Scripts\\"
@@ -106,6 +110,8 @@ fn loadOtherPreferences pref: pref = (
 		greyColour = "7000000"
 	else if (tempString == "dark") then  
 		greyColour = "5000000"
+	
+	greyColour = "7000000"
 	
 	seek pref 0
 	skipToString pref "Location of Single Arm:"
@@ -367,7 +373,7 @@ fn numOfME Dims: Dims = (
 	
 	local num = 0
 	
-	if objHasPattern() or objHasMainColour() then
+	if objHasBodyPattern() or objHasBodyMainColour() then
 		num = num +1
 	
 	if objHasIcon() then
@@ -384,7 +390,7 @@ fn numOfME Dims: Dims = (
 --	Used primarily in createObjects()
 fn isMutuallyExclusive loc Dims: Dims = (
 	
-	if Dims [loc] == "Pattern" or Dims[loc] == "Main_Colour" or Dims[loc] == "Comp_Colour" then
+	if Dims [loc] == "BPattern" or Dims[loc] == "BMain_Colour" or Dims[loc] == "BComp_Colour" then
 		return true
 	
 	if Dims[loc] == "Icon" then
@@ -418,18 +424,26 @@ allObjects: allObjects= (
 -- 		return false
 
 	--verify the patterns are compatible
-	if not objHasMainColour() or not objHasCompColour() or not objHasPattern() then 
+	if not objHasBodyMainColour() or not objHasBodyCompColour() or not objHasBodyPattern() and
+		objHasHeadMainColour() or not objHasHeadCompColour() or not objHasHeadPattern()then 
 		return true
 	
 	local pcPath = assetPath + "Patterns and Colours\\"
-	local texturePath= ( pcPath + "Pattern(" + patternVal() + ")+Colour(" + mainColourVal() + "_" + compColourVal()+ ").png" )
-	
-	if (getFiles texturePath).count == 0 then (
+	local BodyTexturePath= ( pcPath + "Pattern(" + BodyPatternVal() + ")+Colour(" + BodyMainColourVal() + "_" + BodyCompColourVal()+ ").png" )
+	local HeadTexturePath= ( pcPath + "Pattern(" + HeadPatternVal() + ")+Colour(" + HeadMainColourVal() + "_" + HeadCompColourVal()+ ").png" )
+	print texturePath
+	if (getFiles BodyTexturePath).count == 0 then (
 		if printNotPossibleObjects then 
 			append notPossibleObjects objName
 		return false
 	)
-
+	
+	if (getFiles HeadTexturePath).count == 0 then (
+		if printNotPossibleObjects then 
+			append notPossibleObjects objName
+		return false
+	)
+	
 	return true
 	
 )
@@ -476,21 +490,21 @@ fn getAspectRatioLoc Dims: Dims = (
 
 )
 
-fn getMainColourLoc Dims: Dims = (
+fn getBodyMainColourLoc Dims: Dims = (
 
-	return (findItem Dims "Main_Colour")
-
-)
-
-fn getCompColourLoc Dims: Dims = (
-
-	return (findItem Dims "Comp_Colour")
+	return (findItem Dims "BMain_Colour")
 
 )
 
-fn getPatternLoc Dims: Dims = (
+fn getBodyCompColourLoc Dims: Dims = (
 
-	return (findItem Dims "Pattern")
+	return (findItem Dims "BComp_Colour")
+
+)
+
+fn getBodyPatternLoc Dims: Dims = (
+
+	return (findItem Dims "BPattern")
 
 )
 
@@ -530,6 +544,24 @@ fn getHeadLoc Dims: Dims = (
 
 )
 
+fn getHeadMainColourLoc Dims: Dims = (
+
+	return (findItem Dims "HMain_Colour")
+
+)
+
+fn getHeadCompColourLoc Dims: Dims = (
+
+	return (findItem Dims "HComp_Colour")
+
+)
+
+fn getHeadPatternLoc Dims: Dims = (
+
+	return (findItem Dims "HPattern")
+
+)
+
 fn getBeakLoc Dims: Dims = (
 
 	return (findItem Dims "Beak")
@@ -539,6 +571,12 @@ fn getBeakLoc Dims: Dims = (
 fn getBeakAngleLoc Dims: Dims = (
 
 	return (findItem Dims "Beak_Angle")
+
+)
+
+fn getBeakCountLoc Dims: Dims = (
+
+	return (findItem Dims "Beak_Count")
 
 )
 
@@ -571,21 +609,21 @@ fn objHasAspectRatio Dims: Dims  = (
 
 )
 
-fn objHasMainColour Dims: Dims  = (
+fn objHasBodyMainColour Dims: Dims  = (
 
-	return (findItem Dims "Main_Colour" != 0)
-
-)
-
-fn objHasCompColour Dims: Dims  = (
-
-	return (findItem Dims "Comp_Colour" != 0)
+	return (findItem Dims "BMain_Colour" != 0)
 
 )
 
-fn objHasPattern Dims: Dims  = (
+fn objHasBodyCompColour Dims: Dims  = (
 
-	return (findItem Dims "Pattern" != 0)
+	return (findItem Dims "BComp_Colour" != 0)
+
+)
+
+fn objHasBodyPattern Dims: Dims  = (
+
+	return (findItem Dims "BPattern" != 0)
 
 )
 
@@ -625,6 +663,24 @@ fn objHasHead Dims: Dims  = (
 
 )
 
+fn objHasHeadMainColour Dims: Dims  = (
+
+	return (findItem Dims "HMain_Colour" != 0)
+
+)
+
+fn objHasHeadCompColour Dims: Dims  = (
+
+	return (findItem Dims "HComp_Colour" != 0)
+
+)
+
+fn objHasHeadPattern Dims: Dims  = (
+
+	return (findItem Dims "HPattern" != 0)
+
+)
+
 fn objHasBeak Dims: Dims  = (
 
 	return (findItem Dims "Beak" != 0)
@@ -634,6 +690,12 @@ fn objHasBeak Dims: Dims  = (
 fn objHasBeakAngle Dims: Dims  = (
 
 	return (findItem Dims "Beak_Angle" != 0)
+
+)
+
+fn objHasBeakCount Dims: Dims  = (
+
+	return (findItem Dims "Beak_Count" != 0)
 
 )
 
@@ -665,24 +727,24 @@ fn aspectRatioVal Dims: Dims = (
 
 )
 
-fn mainColourVal Dims: Dims = (
+fn BodyMainColourVal Dims: Dims = (
 
-	return ( objVals [ getMainColourLoc() ] )
-
-)
-
-fn compColourVal Dims: Dims = (
-
-	return ( objVals [ getCompColourLoc() ] )
+	return ( objVals [ getBodyMainColourLoc() ] )
 
 )
 
-fn patternVal Dims: Dims = (
+fn BodyCompColourVal Dims: Dims = (
 
-	if getPatternLoc() != 0 then
-		return ( objVals [ getPatternLoc() ] )
-	else 
-		return ("Solid")
+	return ( objVals [ getBodyCompColourLoc() ] )
+
+)
+
+fn BodyPatternVal Dims: Dims = (
+
+	if getBodyPatternLoc() != 0 then
+		return ( objVals [ getBodyPatternLoc() ] )
+	
+	return ("Solid")
 
 )
 
@@ -718,13 +780,44 @@ fn fractalVal Dims: Dims = (
 
 fn headVal Dims: Dims = (
 
-	return ( objVals [ getHeadLoc() ] )
+	if getHeadLoc() != 0 then
+		return ( objVals [ getHeadLoc() ] )
+	
+	return "No Head"
+
+)
+
+
+fn HeadMainColourVal Dims: Dims = (
+
+	return ( objVals [ getHeadMainColourLoc() ] )
+
+)
+
+fn HeadCompColourVal Dims: Dims = (
+
+	return ( objVals [ getHeadCompColourLoc() ] )
+
+)
+
+fn HeadPatternVal Dims: Dims = (
+
+	if getHeadPatternLoc() != 0 then
+		return ( objVals [ getHeadPatternLoc() ] )
+	
+	return ("Solid")
 
 )
 
 fn beakVal Dims: Dims = (
 
 	return ( objVals [ getBeakLoc() ] )
+
+)
+
+fn beakCountVal Dims: Dims = (
+
+	return ( objVals [ getBeakCountLoc() ] as integer )
 
 )
 
