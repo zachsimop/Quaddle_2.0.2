@@ -1,18 +1,18 @@
-Body	           [2]
-Smoothness:   	   [All]
+Body	           [1]
+Smoothness:   	   [none]
 Aspect_Ratio: 	   [none]
-Body Main Colour:  [All]
-Body Comp Colour:  [none]
-Body Pattern:      [none]
-Arm_Count:    	   [All]
-Arm_Ends:          [All]
-Arm_Angle:    	   [All]
+Body Main Colour:  [3]
+Body Comp Colour:  [3,0]
+Body Pattern:      [1]
+Arm_Count:    	   [4]
+Arm_Ends:          [1]
+Arm_Angle:    	   [1]
 Icon: 	      	   [none]
 Fractal:    	   [none]
-Head:              [none]
-Head Main Colour:  [none]
-Head Comp Colour:  [none]
-Head Pattern:      [none]
+Head:              [1]
+Head Main Colour:  [4]
+Head Comp Colour:  [3,0]
+Head Pattern:      [2]
 Beak:              [none]
 Beak_Count:	   [none]
 Beak_Angle:        [none]
@@ -42,3 +42,7 @@ Fractal:      94
 Head:         9
 Beak:         4
 Beak_Angle:   2
+
+Fix Arms
+Check Body Colour Validity
+	if 

@@ -9,11 +9,11 @@ Script Path: C:\Users\zachs\Documents\Lab\Quaddle_2.0.2\Quaddle_Generator\Script
 
 Asset Path:  C:\Users\zachs\Documents\Lab\Quaddle_2.0.2\Quaddle_Generator\Assets\
 
-Export Path: D:\Quaddle_Repo\Simple_1\
+Export Path: C:\Users\zachs\Documents\Lab\Quaddle_2.0.2\Quaddle_Generator\
 
 -----------------------------------------------------
 
-Export PNGs: On
+Export PNGs: off
 (Options: On, Off)
 
 Picture Angle: 20

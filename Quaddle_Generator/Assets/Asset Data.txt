@@ -1,16 +1,16 @@
 Asset Data
 Body: <"Cubic","Oblong","Sphere","Compressed_Oblong","Concave","Convex">
-Smoothness: <"Wrinkled","Blocky","Inward_Protrusions","Outward_Protrusions">
+Smoothness:<"Wrinkled","Blocky","Inward_Protrusions","Outward_Protrusions">
 Aspect_Ratio: <"Null","Long","Short">
-BMain_Colour: <"7000000","5000000","5050148","5050194","7070059","7070286","7070335">
+BMain_Colour: <"7000000","5050148","5050194","7070059","7070286","7070335">
 BComp_Colour: <"7000000","5000000","5050148","5050194","7070059","7070286","7070335">
-BPattern: <"Solid","Checkered","DStripes","VStripes","HStripes","Triangular","Wavey">
+BPattern: <"Checkered","DStripes","VStripes","HStripes","Triangular","Wavey">
 Arm_Count: <"1","2","3","4","7">
 Arm_Ends: <"Flat","Pointed", "Flared">
 Arm_Angle: <"Straight","Bent_Up","Bent_Down">
 Icon: <"No Icon","Square_0.png","Square_1.png","Cross_0.png","Cross_1.png","Raindrop_0.png","Raindrop_1.png","Leaf_0.png","Leaf_1.png">
-Fractal: <"No Fractal","f (1).png","f (9).png","f (10).png",(15).png","f (77).png","f (78).png","f (88).png","f (89).png">
-Head: <"No Head","Cubic","Oblong","Sphere","Compressed_Oblong","Concave","Convex">
+Fractal: <"No Fractal","f (1).png","f (9).png","f (10).png",(15).png","f f(77).png","f (78).png","f (88).png","f (89).png">
+Head: <"Cubic","Oblong","Sphere","Compressed_Oblong","Concave","Convex">
 HMain_Colour: <"7000000","5000000","5050148","5050194","7070059","7070286","7070335">
 HComp_Colour: <"7000000","5000000","5050148","5050194","7070059","7070286","7070335">
 HPattern: <"Solid","Checkered","DStripes","VStripes","HStripes","Triangular","Wavey">

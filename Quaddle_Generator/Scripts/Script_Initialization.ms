@@ -1,9 +1,4 @@
--- Attention-Circuits-Control L
---Laboratory (www.attention-circuits-control.org) --
-
---For more information on how Quaddles are generated and may be used:
--- Simopoulos, Z., Watson, MR., Voloh, B., Naghizadeh, M., Womelsdorf, T., (2021) “Quaddles: A multidimensional 3D object set with parametrically-controlled
--- and customizable features” Behav Res Methods.
+-- Attention-Circuits-Control 
 
 --Website guide: http://accl.psy.vanderbilt.edu/resources/analysis-tools/3d-image-material/
 --Brief instructions on how to use scripts: http://accl.psy.vanderbilt.edu/quaddlegenerator-brief-instructions/
@@ -409,6 +404,14 @@ Dims: Dims goodSyntax: goodSyntax = (
 		
 	)
 	
+	if not objHasBodyPattern() and (objHasBodyCompColour() and objHasBodyMainColour() ) then (
+		
+		messageBox "You must have main pattern to have both main and comp colours"
+		mybool = false
+		return mybool
+		
+	)
+	
 	if objHasHeadPattern() and (not objHasHeadCompColour() or not objHasHeadMainColour() ) then (
 		
 		messageBox "You must have both main and comp head colours to have a head pattern"
@@ -417,8 +420,15 @@ Dims: Dims goodSyntax: goodSyntax = (
 		
 	)
 	
-	if not objHasArmCount() and
-	   ( objHasArmAngle() or objHasArmEnds() ) then (
+	if not objHasHeadPattern() and objHasHeadCompColour() and objHasHeadMainColour() then (
+		
+		messageBox "You must have comp pattern to have both main and comp colours"
+		mybool = false
+		return mybool
+		
+	)
+	
+	if not objHasArmCount() and ( objHasArmAngle() or objHasArmEnds() ) then (
 		
 		messageBox "You must have an Arm Count dimension to have have an Arm Angle or Arm End "
 		mybool = false

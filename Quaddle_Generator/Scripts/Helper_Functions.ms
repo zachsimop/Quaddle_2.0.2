@@ -419,31 +419,38 @@ fn okToGenerate
 dimCount: dimCount objVals: objVals assetPath:assetPath objName: objName
 allObjects: allObjects= (
 	
-	--verify a version has not been created
--- 	if findItem allObjects objName != 0 then
--- 		return false
+	--At this point, there are certainis criter which were already checked
+	--in the checkForErrors Function in Script_Initialization.ms
+	--This function is called right before an object is generated
+	--to see if it's pattern/colour combo exist. If it doesn't,
+	--it will store the name into an object which saves the names of all the
+	--objects that couldn't be generatred. Otherwise it gives QuaddleConstructor
+	--the ok to generate the object (returns true)
+	
+	--ok if there is just a main body colour 
+	if not objHasBodyCompColour() and not objHasHeadCompColour() then
+		return true
 
 	--verify the patterns are compatible
-	if not objHasBodyMainColour() or not objHasBodyCompColour() or not objHasBodyPattern() and
-		objHasHeadMainColour() or not objHasHeadCompColour() or not objHasHeadPattern()then 
-		return true
-	
 	local pcPath = assetPath + "Patterns and Colours\\"
-	local BodyTexturePath= ( pcPath + "Pattern(" + BodyPatternVal() + ")+Colour(" + BodyMainColourVal() + "_" + BodyCompColourVal()+ ").png" )
-	local HeadTexturePath= ( pcPath + "Pattern(" + HeadPatternVal() + ")+Colour(" + HeadMainColourVal() + "_" + HeadCompColourVal()+ ").png" )
-	print texturePath
-	if (getFiles BodyTexturePath).count == 0 then (
+	if objHasBodyCompColour() then (
+		local BodyTexturePath= ( pcPath + "Pattern(" + BodyPatternVal() + ")+Colour(" + BodyMainColourVal() + "_" + BodyCompColourVal()+ ").png" )
+		if (getFiles BodyTexturePath).count == 0 then (
 		if printNotPossibleObjects then 
 			append notPossibleObjects objName
 		return false
+		)
 	)
 	
-	if (getFiles HeadTexturePath).count == 0 then (
-		if printNotPossibleObjects then 
-			append notPossibleObjects objName
-		return false
+	if objHasHeadCompColour() then (
+		local HeadTexturePath= ( pcPath + "Pattern(" + HeadPatternVal() + ")+Colour(" + HeadMainColourVal() + "_" + HeadCompColourVal()+ ").png" )
+		if (getFiles HeadTexturePath).count == 0 then (
+			if printNotPossibleObjects then 
+				append notPossibleObjects objName
+			return false
+		)
 	)
-	
+
 	return true
 	
 )
@@ -735,7 +742,9 @@ fn BodyMainColourVal Dims: Dims = (
 
 fn BodyCompColourVal Dims: Dims = (
 
-	return ( objVals [ getBodyCompColourLoc() ] )
+	if getBodyCompColourLoc() != 0 then
+		return ( objVals [ getBodyCompColourLoc() ] )
+	return "None"
 
 )
 
@@ -790,14 +799,16 @@ fn headVal Dims: Dims = (
 
 fn HeadMainColourVal Dims: Dims = (
 
-	return ( objVals [ getHeadMainColourLoc() ] )
-
+	if getHeadMainColourLoc() != 0 then
+		return ( objVals [ getHeadMainColourLoc() ] )
+	return "None"	
 )
 
 fn HeadCompColourVal Dims: Dims = (
 
-	return ( objVals [ getHeadCompColourLoc() ] )
-
+	if getHeadCompColourLoc() != 0 then
+		return ( objVals [ getHeadCompColourLoc() ] )
+	return "None"	
 )
 
 fn HeadPatternVal Dims: Dims = (

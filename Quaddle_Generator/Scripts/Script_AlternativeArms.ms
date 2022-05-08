@@ -10,7 +10,7 @@
 --Scripts, objects and in depth manual available on github: https://github.com/att-circ-contrl/Quaddles-Gen
 
 
-	--makes blunted and sharp arms(
+	--makes blunted and sharp arms
 	
 	if numberOfArms == 0 then 
 		return null
@@ -69,10 +69,10 @@
 		
 		if (numberOfArms >= 5) then (
 			
-			for i = 2 to numberOfArms + 1 do (
+			for i = 1 to numberOfArms-1 do (
 				
 				append listOfArms (instance arm)
-				rotate listOfArms[i] (eulerangles 0 0 (i*rotAmount))
+				rotate listOfArms[i+1] (eulerangles 0 0 (i*rotAmount))
 				
 			)
 			
@@ -124,15 +124,13 @@
 		
 		if (numberOfArms >= 5) then (
 			
-			for i = 2 to numberOfArms + 1 do (
+			for iter = 1 to numberOfArms-1 do (
 				
 				append listOfArms (instance arm)
-				rotate listOfArms[i] (eulerangles 0 0 (i*rotAmount))
-				
+				rotate listOfArms[iter+1] (eulerangles 0 0 (iter*rotAmount))
 			)
 			
-		) else (
-		
+		) else (		
 			if (numberOfArms >= 2) then (
 				append listOfArms (instance arm)
 				rotate listOfArms[2] (eulerangles 0 0 180)
@@ -162,7 +160,7 @@
 
 	
 	return listOfArms
-		
+
 -- fn createLeftArm arm: arm listOfArms: listOfArms potrusionAmount: potrusionAmount = (
 -- 		append listOfArms (instance arm)
 -- 		rotate listOfArms[2] (eulerangles 0 90 180)

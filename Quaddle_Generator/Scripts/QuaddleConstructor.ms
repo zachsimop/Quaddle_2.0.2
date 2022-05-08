@@ -1022,7 +1022,7 @@ fn MakeDefaultArms bendAngle objName assetPath:assetPath = (
 	include "Script_DefaultArms.ms"
 )
 
-fn MakeAlternativeArms bendAngle startradius endradius objName numberOfArms 
+fn MakeAlternativeArms bendAngle startradius endradius objName numberOfArms
 	genLeft assetPath:assetPath isBeak: isBeak headBody: headBody objbody: objbody armScale: armScale = (
 	--Description: Creates and adds four arms to quaddle bodies. The arms are cones which can have different diameters on each end
 	--Input: bendAngle (the amount to which the arms are bent. Positive numbers bend downwards, Negative numbers bend upward), objName,
